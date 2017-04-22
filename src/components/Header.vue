@@ -58,7 +58,7 @@
     color: #fff;
     .userinfo {
       text-align: right;
-      padding-right: 35px;
+      padding-right: 45px;
       float: right;
       .userinfo-inner {
         cursor: pointer;
@@ -67,7 +67,7 @@
           width: 40px;
           height: 40px;
           border-radius: 20px;
-          margin: 10px 0px 10px 10px;
+          margin: 10px 0px 10px 20px;
           float: right;
         }
       }
@@ -75,7 +75,7 @@
     .logo {
       height: 60px;
       font-size: 22px;
-      padding-left: 20px;
+      padding-left: 10px;
       padding-right: 20px;
       border-right: 1px solid rgba(238,241,146,0.3);
       img {
