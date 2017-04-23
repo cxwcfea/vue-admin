@@ -6,13 +6,14 @@
       @open="handleOpen"
       @close="handleClose"
       v-show="!collapsed"
+      router
     >
       <el-submenu index="1">
         <template slot="title"><i class="el-icon-message"></i>导航一</template>
         <el-menu-item index="1-1">选项1</el-menu-item>
       </el-submenu>
-      <el-menu-item index="2"><i class="el-icon-menu"></i> <router-link to="/user" tag="span">用户</router-link> </el-menu-item>
-      <el-menu-item index="3"><i class="el-icon-setting"></i> <router-link to="/order" tag="span">订单</router-link> </el-menu-item>
+      <el-menu-item index="/user"><i class="el-icon-menu"></i>用户</el-menu-item>
+      <el-menu-item index="/order"><i class="el-icon-setting"></i>订单</el-menu-item>
     </el-menu>
     <ul class="el-menu el-menu-vertical-demo collapsed" v-show="collapsed" ref="menuCollapsed">
       <li class="el-submenu item">

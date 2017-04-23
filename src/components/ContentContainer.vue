@@ -1,6 +1,24 @@
 <template>
   <section class="content-container">
-    <router-view></router-view>
+    <div class="grid-content bg-purple-light">
+      <el-col :span="24" class="breadcrumb-container">
+        <strong class="title">{{ $route.name }}</strong>
+        <el-breadcrumb separator="/" class="breadcrumb-inner">
+          <el-breadcrumb-item v-for="item in $route.matched" :key="item.path">
+            {{ item.name }}
+          </el-breadcrumb-item>
+        </el-breadcrumb>
+      </el-col>
+      <el-col :span="24" class="content-wrapper">
+        <transition
+          mode="out-in"
+          enter-active-class="animated fadeIn"
+          leave-active-class="animated fadeOut"
+        >
+          <router-view></router-view>
+        </transition>
+      </el-col>
+    </div>
   </section>
 </template>
 

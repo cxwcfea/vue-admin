@@ -14,8 +14,8 @@
           <img :src="userAvatar">{{ loginInfo.name }}
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>更改密码</el-dropdown-item>
-          <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
+          <el-dropdown-item @click.native="changePassword">更改密码</el-dropdown-item>
+          <el-dropdown-item divided @click.native="onLogout">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </el-col>
@@ -24,6 +24,7 @@
 
 <script>
   import { mapGetters } from 'vuex';
+  import { logout } from '../common/auth';
 
   export default {
     data() {
@@ -43,8 +44,12 @@
         this.collapsed = !this.collapsed;
         this.$emit('collapse', this.collapsed);
       },
-      logout() {
-
+      onLogout() {
+        logout();
+        this.$router.push({ path: '/login' });
+      },
+      changePassword() {
+        console.log('click');
       },
     },
   };

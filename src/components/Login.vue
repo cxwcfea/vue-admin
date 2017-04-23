@@ -19,6 +19,9 @@
   import { login } from '../common/auth';
 
   export default {
+    mounted() {
+      this.CLEAR_LOGIN_INFO();
+    },
     data() {
       return {
         loading: false,
@@ -40,6 +43,7 @@
     methods: {
       ...mapMutations([
         'SET_LOGIN_INFO',
+        'CLEAR_LOGIN_INFO',
       ]),
       handleSubmit() {
         this.$refs.loginForm.validate((valid) => {

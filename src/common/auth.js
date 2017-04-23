@@ -49,6 +49,7 @@ function login(user) {
 
 function logout() {
   localStorage.removeItem('vue-admin-token');
+  payload = null;
 }
 
 function changePassword(data) {

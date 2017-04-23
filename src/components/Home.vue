@@ -26,7 +26,6 @@
     },
     methods: {
       onSiderChange(collapsed) {
-        console.log(collapsed);
         this.siderBarCollapsed = collapsed;
       },
     },
