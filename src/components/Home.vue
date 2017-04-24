@@ -1,6 +1,6 @@
 <template>
   <el-row class="container">
-    <app-header v-on:collapse="onSiderChange"></app-header>
+    <app-header v-on:collapse="onSiderChange" :collapsed="siderBarCollapsed"></app-header>
     <el-col :span="24" class="main">
       <app-sider :collapsed="siderBarCollapsed"></app-sider>
       <app-container></app-container>
@@ -16,7 +16,7 @@
   export default {
     data() {
       return {
-        siderBarCollapsed: false,
+        siderBarCollapsed: window.innerWidth < 1024,
       };
     },
     components: {
@@ -28,6 +28,13 @@
       onSiderChange(collapsed) {
         this.siderBarCollapsed = collapsed;
       },
+      handleResize() {
+        const { innerWidth } = window;
+        this.siderBarCollapsed = (innerWidth < 1024);
+      },
+    },
+    created() {
+      window.addEventListener('resize', this.handleResize);
     },
   };
 </script>

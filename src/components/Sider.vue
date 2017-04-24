@@ -1,7 +1,7 @@
 <template>
   <aside :class="collapsed ? 'menu-collapsed': 'menu-expanded'">
     <el-menu
-      default-active="$route.path"
+      :default-active="$route.path"
       class="el-menu-vertical-demo"
       @open="handleOpen"
       @close="handleClose"

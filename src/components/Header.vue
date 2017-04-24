@@ -27,9 +27,9 @@
   import { logout } from '../common/auth';
 
   export default {
+    props: ['collapsed'],
     data() {
       return {
-        collapsed: false,
         userAvatar: 'http://tpl.amazeui.org/template/21/admin/assets/img/user04.png',
         brand: '后台管理系统',
       };
