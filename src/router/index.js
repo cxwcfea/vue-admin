@@ -2,11 +2,24 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from '@/components/Home';
 import Login from '@/components/Login';
-import User from '@/components/User';
-import Order from '@/components/Order';
+import menuModule from '@/store/modules/menu';
 import { isLoggedIn } from '@/common/auth';
 
 Vue.use(Router);
+
+// Menu should have 2 levels.
+function generateRoutesFromMenu(menu = [], routes = []) {
+  for (let i = 0, l = menu.length; i < l; i += 1) {
+    const item = menu[i];
+    if (item.path) {
+      routes.push(item);
+    }
+    if (!item.component) {
+      generateRoutesFromMenu(item.children, routes);
+    }
+  }
+  return routes;
+}
 
 const router = new Router({
   mode: 'history',
@@ -17,16 +30,7 @@ const router = new Router({
       component: Home,
       meta: { requiresAuth: true },
       children: [
-        {
-          path: 'user',
-          name: 'User',
-          component: User,
-        },
-        {
-          path: 'order',
-          name: 'Order',
-          component: Order,
-        },
+        ...generateRoutesFromMenu(menuModule.state.items),
       ],
     },
     {
@@ -40,6 +44,10 @@ const router = new Router({
           next();
         }
       },
+    },
+    {
+      path: '*',
+      redirect: '/',
     },
   ],
 });

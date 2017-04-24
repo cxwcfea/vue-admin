@@ -56,7 +56,7 @@
                 this.$message({
                   message: '成功',
                 });
-                let path = '/';
+                let path = '/dashboard';
                 if (this.$route.query.redirect) {
                   path = this.$route.query.redirect;
                 }
