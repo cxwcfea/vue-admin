@@ -41,8 +41,7 @@
     },
     methods: {
       collapse() {
-        this.collapsed = !this.collapsed;
-        this.$emit('collapse', this.collapsed);
+        this.$emit('collapse', !this.collapsed);
       },
       onLogout() {
         logout();

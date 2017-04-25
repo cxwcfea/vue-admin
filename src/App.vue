@@ -20,6 +20,12 @@
 </script>
 
 <style lang="scss">
+  @import './assets/animate.css';
+
+  .animated {
+    animation-duration: .377s;
+  }
+
   body {
     margin: 0px;
     padding: 0px;

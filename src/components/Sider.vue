@@ -6,7 +6,6 @@
       @open="handleOpen"
       @close="handleClose"
       @select="handleSelect"
-      unique-opened
       v-show="!collapsed"
       router
     >

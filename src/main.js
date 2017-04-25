@@ -10,7 +10,33 @@ import 'font-awesome/css/font-awesome.min.css';
 import router from './router';
 import store from './store/store';
 import App from './App';
-import './assets/animate.css';
+// import './assets/animate.css';
+import { getToken, logout } from './common/auth';
+
+axios
+  .interceptors
+  .request
+  .use(
+    (config) => {
+      const token = getToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    error => Promise.reject(error),
+  );
+
+axios
+  .interceptors
+  .response
+  .use(null, (error) => {
+    if (error.response.status === 401) {
+      logout();
+      router.push({ path: '/login' });
+    }
+    return Promise.reject(error);
+  });
 
 Vue.config.productionTip = false;
 

@@ -4,7 +4,6 @@ export default {
   name: 'Orders',
   meta: {
     icon: 'fa-cart-arrow-down',
-    expanded: false,
   },
   children: [
     {
@@ -12,7 +11,6 @@ export default {
       path: '/orders/list',
       meta: {
         label: 'All Orders',
-        link: 'tables/Basic.vue',
       },
       component: Order,
     },
