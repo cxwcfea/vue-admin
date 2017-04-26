@@ -39,7 +39,7 @@ const tableState = {
     isLoading: false,
     currentPage: 1,
     pageSize: 15,
-    total: 0,
+    total: -1,
     path: '/api/users',
   },
 };
@@ -63,11 +63,18 @@ const actions = {
   async getUserList({ commit, state }, data) {
     commit('SET_LOADING', 'userList');
     const page = data.page;
+    let queryStr = '';
+    if (data.search) {
+      queryStr += `&search=${data.search}`;
+    }
+    if (data.channel) {
+      queryStr += `&channel=${data.channel}`;
+    }
     const limit = state.userList.pageSize;
     const offset = (page - 1) * limit;
     try {
       commit('CLEAR_LOADING', 'userList');
-      const { data: response } = await axios.get(`${state.userList.path}?offset=${offset}&limit=${limit}`);
+      const { data: response } = await axios.get(`${state.userList.path}?offset=${offset}&limit=${limit}${queryStr}`);
       commit('SET_LIST_DATA', { tag: 'userList', count: response.count, content: response.data, currentPage: page });
     } catch (error) {
       commit('CLEAR_LOADING', 'userList');
