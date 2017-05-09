@@ -12,13 +12,7 @@
         <el-form-item label="注册渠道">
           <el-select v-model="query.channel" @change="onChannelChange" placeholder="请选择注册渠道">
             <el-option value="all" label="全部"></el-option>
-            <el-option value="jiaoyouweidai"></el-option>
-            <el-option value="loan"></el-option>
-            <el-option value="newloan"></el-option>
-            <el-option value="jizhihui1"></el-option>
-            <el-option value="ios_weidai"></el-option>
-            <el-option value="tui"></el-option>
-            <el-option value="tui_sms"></el-option>
+            <el-option v-for="item in channel" :value="item" :key="item"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="注册时间">
@@ -55,6 +49,7 @@
 
 <script>
   import { mapGetters, mapActions } from 'vuex';
+  import { CHANNEL } from '../common/constants';
 
   function checkMobile(rule, value, callback) {
     const message = '请输入有效的手机号';
@@ -80,6 +75,7 @@
             { validator: checkMobile, message: '请输入有效的手机号', trigger: 'blur' },
           ],
         },
+        channel: CHANNEL,
       };
     },
     computed: {

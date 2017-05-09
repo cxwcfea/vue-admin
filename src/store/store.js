@@ -6,7 +6,11 @@ import table from '@/store/modules/table';
 
 Vue.use(Vuex);
 
+const state = {
+};
+
 export default new Vuex.Store({
+  state,
   modules: {
     auth,
     menu,

@@ -31,7 +31,7 @@
     data() {
       return {
         userAvatar: 'http://tpl.amazeui.org/template/21/admin/assets/img/user04.png',
-        brand: '后台管理系统',
+        brand: '小贷后台',
       };
     },
     computed: {

@@ -1,4 +1,4 @@
-import Order from '@/components/Order';
+import AllOrders from '@/components/AllOrders';
 
 export default {
   name: 'Orders',
@@ -12,7 +12,7 @@ export default {
       meta: {
         label: 'All Orders',
       },
-      component: Order,
+      component: AllOrders,
     },
   ],
 };
