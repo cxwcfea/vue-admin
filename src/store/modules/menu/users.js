@@ -4,13 +4,14 @@ export default {
   name: 'Users',
   meta: {
     icon: 'fa-user-o',
+    label: '用户',
   },
   children: [
     {
       name: 'UserList',
       path: '/users/list',
       meta: {
-        label: 'All Register Users',
+        label: '用户列表',
       },
       component: UserList,
     },

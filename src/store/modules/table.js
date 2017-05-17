@@ -1,6 +1,7 @@
 import axios from 'axios';
 import _ from 'lodash';
 import { dateFormatter, gender, amount, orderStatus } from '../../common/filter';
+import { getOverdueOrders } from '../../common/services';
 
 const tableState = {
   userList: {
@@ -115,6 +116,82 @@ const tableState = {
     total: -1,
     path: '/api/loans',
   },
+  overdueOrders: {
+    cols: [
+      {
+        label: '姓名',
+        prop: 'name',
+      },
+      {
+        label: '手机号',
+        prop: 'mobile',
+      },
+      {
+        label: '身份证',
+        prop: 'ic_number',
+      },
+      {
+        label: '申请日',
+        prop: 'apply_date',
+        filter(row, column) {
+          return dateFormatter(row[column.property]);
+        },
+      },
+      {
+        label: '借款',
+        prop: 'principal',
+        filter(row, column) {
+          return amount(row[column.property]);
+        },
+      },
+      {
+        label: '实付',
+        prop: 'pay_amount',
+        filter(row, column) {
+          return amount(row[column.property]);
+        },
+      },
+      {
+        label: '服务费',
+        prop: 'handling_fee',
+        filter(row, column) {
+          return amount(row[column.property]);
+        },
+      },
+      {
+        label: '待还',
+        prop: 'repayAmount',
+        filter(row, column) {
+          return amount(row[column.property]);
+        },
+      },
+      {
+        label: '周期',
+        prop: 'period',
+      },
+      {
+        label: '应还日',
+        prop: 'repay_date',
+        filter(row, column) {
+          return dateFormatter(row[column.property]);
+        },
+      },
+      {
+        label: '逾期天数',
+        prop: 'overdueDays',
+      },
+      {
+        label: '催收员',
+        prop: 'collector',
+      },
+    ],
+    data: [],
+    isLoading: false,
+    currentPage: 1,
+    pageSize: 15,
+    total: -1,
+    path: '/api/overdue_sub_loans',
+  },
 };
 
 const mutations = {
@@ -123,6 +200,12 @@ const mutations = {
     state[tag].data = payload.content;
     state[tag].total = payload.count;
     state[tag].currentPage = payload.currentPage;
+  },
+  SET_LIST_SIZE(state, payload) {
+    state[payload.tag].pageSize = payload.pageSize;
+  },
+  UPDATE_LIST_DATA(state, payload) {
+    state[payload.tag].data = payload.data;
   },
   SET_LOADING(state, tag) {
     state[tag].isLoading = true;
@@ -182,11 +265,29 @@ const actions = {
       throw error;
     }
   },
+  async getOverdueOrders({ commit, state }, data) {
+    try {
+      commit('SET_LOADING', 'overdueOrders');
+      const page = data.page;
+      const result =
+        await getOverdueOrders(data, state.overdueOrders.pageSize, state.overdueOrders.path);
+      commit('CLEAR_LOADING', 'overdueOrders');
+      commit('SET_LIST_DATA', { tag: 'overdueOrders', count: result.count, content: result.data, currentPage: page });
+    } catch (error) {
+      commit('CLEAR_LOADING', 'overdueOrders');
+      throw error;
+    }
+  },
+  changeOverdueOrdersListSize({ dispatch, commit }, data) {
+    commit('SET_LIST_SIZE', { tag: 'overdueOrders', pageSize: data.pageSize });
+    dispatch('getOverdueOrders', data);
+  },
 };
 
 const getters = {
   userList: state => state.userList,
   allOrders: state => state.allOrders,
+  overdueOrders: state => state.overdueOrders,
 };
 
 export default {

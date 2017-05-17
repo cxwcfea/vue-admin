@@ -45,10 +45,11 @@
       },
       onLogout() {
         logout();
-        this.$router.push({ path: '/login' });
+        // this.$router.push({ path: '/login' });
+        this.$router.go('/login');
       },
       changePassword() {
-        console.log('click');
+        console.log('not implemented');
       },
     },
   };

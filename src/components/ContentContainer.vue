@@ -2,7 +2,7 @@
   <section class="content-container">
     <div class="grid-content bg-purple-light">
       <el-col :span="24" class="breadcrumb-container">
-        <strong class="title">{{ $route.name }}</strong>
+        <strong class="title">{{ $route.meta.label }}</strong>
         <el-breadcrumb separator="/" class="breadcrumb-inner">
           <el-breadcrumb-item v-for="item in $route.matched" :key="item.path">
             {{ item.name }}
@@ -12,8 +12,7 @@
       <el-col :span="24" class="content-wrapper">
         <transition
           mode="out-in"
-          enter-active-class="animated fadeIn"
-          leave-active-class="animated fadeOut"
+          name="el-zoom-in-top"
         >
           <router-view></router-view>
         </transition>

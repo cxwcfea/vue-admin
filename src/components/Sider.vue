@@ -3,18 +3,15 @@
     <el-menu
       :default-active="$route.path"
       class="el-menu-vertical-demo"
-      @open="handleOpen"
-      @close="handleClose"
-      @select="handleSelect"
       v-show="!collapsed"
       router
     >
       <template v-for="(item, index) in menu">
         <el-submenu :index="index+''" v-if="item.children && item.children.length">
-          <template slot="title"><i :class="['fa', item.meta.icon]"></i>{{ item.name }}</template>
-          <el-menu-item v-for="child in item.children" :index="child.path" :key="child.path">{{ child.name }}</el-menu-item>
+          <template slot="title"><i :class="['fa', item.meta.icon]"></i>{{ item.meta.label }}</template>
+          <el-menu-item v-for="child in item.children" v-if="child.meta.hidden !== true" :index="child.path" :key="child.path">{{ child.meta.label }}</el-menu-item>
         </el-submenu>
-        <el-menu-item v-if="!item.children || item.children.length === 0" :index="item.path"><i :class="['fa', item.meta.icon]"></i>{{ item.name }}</el-menu-item>
+        <el-menu-item v-if="!item.children || item.children.length === 0" :index="item.path"><i :class="['fa', item.meta.icon]"></i>{{ item.meta.label }}</el-menu-item>
       </template>
     </el-menu>
     <ul class="el-menu el-menu-vertical-demo collapsed" v-show="collapsed" ref="menuCollapsed">
@@ -27,11 +24,12 @@
             <li
               class="el-menu-item"
               style="padding-left: 40px;"
+              v-if="child.meta.hidden !== true"
               v-for="child in item.children"
               @click="$router.push(child.path)"
               :key="child.path"
               :class="$route.path === child.path ? 'is-active' : ''">
-              {{ child.name }}
+              {{ child.meta.label }}
             </li>
           </ul>
         </template>
@@ -62,15 +60,6 @@
       }),
     },
     methods: {
-      handleOpen() {
-
-      },
-      handleClose() {
-
-      },
-      handleSelect() {
-
-      },
       showMenu(i, status) {
         const menuItem = this.$refs.menuCollapsed.getElementsByClassName(`submenu-hook-${i}`)[0];
         menuItem.style.display = status ? 'block' : 'none';

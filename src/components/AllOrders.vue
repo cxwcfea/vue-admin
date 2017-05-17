@@ -83,7 +83,7 @@
         <el-table-column prop="overdue_date" label="应还款日期" :formatter="dateFormatter"></el-table-column>
         <el-table-column prop="repaid_date" label="还款日期" :formatter="dateFormatter"></el-table-column>
         <el-table-column prop="status" label="状态" :formatter="subLoanState"></el-table-column>
-        <el-table-column prop="x" label="逾期"></el-table-column>
+        <el-table-column prop="overdueDays" label="逾期"></el-table-column>
       </el-table>
     </el-dialog>
 
@@ -136,6 +136,7 @@
     eliminateOrder,
     handleError,
   } from '../common/services';
+  import calcOverdueDays from '../common/utils';
 
   let query = {
     channel: 'jiaoyouweidai',
@@ -271,6 +272,9 @@
       async showLoanDetail(loan) {
         try {
           ({ loanTrans: this.loanTransInfo, subLoans: this.subLoans } = await getLoanDetail(loan));
+          this.subLoans.forEach((elem) => {
+            elem.overdueDays = calcOverdueDays(elem);
+          });
           this.detailVisible = true;
         } catch (error) {
           handleError(error, this.$message);

@@ -23,7 +23,7 @@ function amount(value) {
   if (Number.isNaN(value)) {
     return value;
   }
-  return (value / 100).toFixed(2);
+  return (value / 100).toFixed(0);
 }
 
 const orderStatusArr = new Map(ORDER_STATUS);
@@ -33,8 +33,38 @@ function orderStatus(val) {
 }
 
 function orderTransStep(value) {
-  if (!value) return '';
+  if (!value) {
+    return '';
+  }
   return `${orderStatus(value.from_status_id_fk)} 到 ${orderStatus(value.to_status_id_fk)}`;
+}
+
+function begRecordType(val) {
+  switch (val) {
+    case 0:
+      return '人工';
+    case 1:
+      return '短信';
+    case 2:
+      return '联系人短信';
+    default:
+      return '未知';
+  }
+}
+
+function paymentType(val) {
+  switch (val) {
+    case 0:
+      return '新浪支付';
+    case 100:
+      return '支付宝';
+    case 101:
+      return '微信';
+    case 102:
+      return '网银';
+    default:
+      return '其他';
+  }
 }
 
 export {
@@ -43,4 +73,6 @@ export {
   amount,
   orderStatus,
   orderTransStep,
+  begRecordType,
+  paymentType,
 };

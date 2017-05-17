@@ -17,6 +17,7 @@
 <script>
   import { mapMutations } from 'vuex';
   import { login } from '../common/auth';
+  import { handleError } from '../common/services';
 
   export default {
     mounted() {
@@ -62,16 +63,9 @@
                 }
                 this.$router.push({ path });
               })
-              .catch((e) => {
+              .catch((err) => {
                 this.loading = false;
-                let message = e.message;
-                if (e.response) {
-                  message = e.response.data.msg;
-                }
-                this.$message({
-                  message,
-                  type: 'error',
-                });
+                handleError(err, this.$message);
               });
             return true;
           }
