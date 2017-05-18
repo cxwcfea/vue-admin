@@ -20,10 +20,11 @@ function gender(ID) {
 }
 
 function amount(value) {
-  if (Number.isNaN(value)) {
+  const val = Number.parseInt(value, 10);
+  if (Number.isNaN(val)) {
     return value;
   }
-  return (value / 100).toFixed(0);
+  return (val / 100).toFixed(0);
 }
 
 const orderStatusArr = new Map(ORDER_STATUS);

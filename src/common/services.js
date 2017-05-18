@@ -119,6 +119,52 @@ export async function assignCollectOrders(data) {
   return result;
 }
 
+export async function queryCompanyAccount() {
+  const result = await axios.get('/api/query_company_account');
+  return result.data;
+}
+
+export async function queryCompanyLoanAccount() {
+  const result = await axios.get('/api/query_loan_account');
+  const components = result.data.split('^');
+  return components[2];
+}
+
+export async function queryCompanyPayAccount() {
+  const result = await axios.get('/api/query_repay_account');
+  const components = result.data.split('^');
+  return components[2];
+}
+
+export async function queryBalanceAccount(uid) {
+  const result = await axios.get(`/api/query_balance_account?uid=${uid}`);
+  return result.data;
+}
+
+export async function companyDeposit(amount) {
+  const { data } = await axios.get(`/api/company_deposit?amount=${amount}`);
+  if (data.code === 0) {
+    return data.data.redirect_url;
+  }
+  throw new Error(data.message);
+}
+
+export async function companyCollect(amount) {
+  const { data } = await axios.get(`/api/company_collect?amount=${amount}`);
+  if (data.code === 0) {
+    return data.data.redirect_url;
+  }
+  throw new Error(data.message);
+}
+
+export async function companyPay(amount) {
+  const { data } = await axios.get(`/api/company_pay?amount=${amount}`);
+  if (data.code === 0) {
+    return true;
+  }
+  throw new Error(data.message);
+}
+
 export function handleError(error, showMsg) {
   let message = error.message;
   if (error.response) {

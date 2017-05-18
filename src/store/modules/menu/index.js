@@ -1,4 +1,5 @@
 import Dashboard from '@/components/Dashboard';
+import Finance from '@/components/Finance';
 import users from './users';
 import orders from './orders';
 import { currentUser } from '../../../common/auth';
@@ -30,6 +31,16 @@ const menuState = {
         label: 'Dashboard',
       },
       component: Dashboard,
+    },
+    {
+      name: 'Finance',
+      path: '/finance',
+      meta: {
+        icon: 'fa-money',
+        label: '财务',
+        roles: ['F_SUPPORT', 'FINANCE'],
+      },
+      component: Finance,
     },
     users,
     orders,
