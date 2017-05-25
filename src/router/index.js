@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from '@/components/Home';
 import Login from '@/components/Login';
+import User from '@/components/User';
 import menuModule from '@/store/modules/menu';
 import { isLoggedIn } from '@/common/auth';
 
@@ -32,6 +33,14 @@ const router = new Router({
       meta: { requiresAuth: true },
       children: [
         ...generateRoutesFromMenu(menuModule.state.items),
+        {
+          name: 'UserDetail',
+          path: '/user/:id',
+          meta: {
+            label: '用户详情',
+          },
+          component: User,
+        },
       ],
     },
     {

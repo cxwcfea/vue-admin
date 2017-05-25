@@ -68,6 +68,19 @@ function paymentType(val) {
   }
 }
 
+function mobileOS(val) {
+  switch (val) {
+    case 1:
+      return 'Android';
+    case 2:
+      return 'iOS';
+    case 3:
+      return 'H5';
+    default:
+      return '未知';
+  }
+}
+
 export {
   dateFormatter,
   gender,
@@ -76,4 +89,5 @@ export {
   orderTransStep,
   begRecordType,
   paymentType,
+  mobileOS,
 };

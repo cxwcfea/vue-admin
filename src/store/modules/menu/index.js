@@ -1,5 +1,6 @@
 import Dashboard from '@/components/Dashboard';
 import Finance from '@/components/Finance';
+import Test from '@/components/Test';
 import users from './users';
 import orders from './orders';
 import { currentUser } from '../../../common/auth';
@@ -44,6 +45,15 @@ const menuState = {
     },
     users,
     orders,
+    {
+      name: 'Test',
+      path: '/test',
+      meta: {
+        icon: 'fa-money',
+        label: '测试',
+      },
+      component: Test,
+    },
   ],
 };
 
