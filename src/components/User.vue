@@ -22,9 +22,6 @@
             <el-card class="box-card">
               <div slot="header" class="clearfix card-header">
                 <span style="line-height: 18px;">基本资料</span>
-                <!--
-                <el-button style="float: right;" type="primary">操作按钮</el-button>
-                -->
               </div>
               <el-row class="detail">
                 <el-col :span="12" class="item">
@@ -50,9 +47,6 @@
             <el-card class="box-card">
               <div slot="header" class="clearfix card-header">
                 <span style="line-height: 18px;">设备信息</span>
-                <!--
-                <el-button style="float: right;" type="primary">操作按钮</el-button>
-                -->
               </div>
               <el-row class="detail">
                 <el-col :span="12" class="item">
@@ -85,13 +79,10 @@
         </el-row>
         <el-row :gutter="15" style="margin-top: 5px">
           <el-col :span="8">
-            <d-player :video="user.video" v-if="user.video"></d-player>
-            <!--
-            <video controls :src="user.video.url || ''" width="100%" height="380"></video>
-            -->
+            <d-player :video="user.video"></d-player>
           </el-col>
           <el-col :span="16">
-            <div class="amap-page-container" v-if="user.map">
+            <div class="amap-page-container">
               <el-amap vid="amapDemo" :zoom="user.map.zoom" :center="user.map.center" class="amap-demo">
                 <el-amap-marker :position="user.map.marker.position" :visible="user.map.marker.visible" :draggable="user.map.marker.draggable"></el-amap-marker>
               </el-amap>
