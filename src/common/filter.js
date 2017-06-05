@@ -81,6 +81,34 @@ function mobileOS(val) {
   }
 }
 
+function callDirection(val) {
+  switch (val) {
+    case 1:
+      return '呼出';
+    case 2:
+      return '呼入';
+    case '0':
+      return '呼出';
+    case '1':
+      return '呼入';
+    default:
+      return '未知';
+  }
+}
+
+function smsDirection(val) {
+  switch (val) {
+    case 1:
+      return '接收';
+    case 2:
+      return '发出';
+    case 6:
+      return '草稿';
+    default:
+      return '未知';
+  }
+}
+
 export {
   dateFormatter,
   gender,
@@ -90,4 +118,6 @@ export {
   begRecordType,
   paymentType,
   mobileOS,
+  callDirection,
+  smsDirection,
 };

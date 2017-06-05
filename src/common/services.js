@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import axios from 'axios';
-import calcOverdueDays from './utils';
+import { calcOverdueDays } from './utils';
 
 export async function requestRiskCheck(loan) {
   const res = await axios.get(`/api/request_risk_check?uid=${loan.user_id_fk}&oid=${loan.id}`);
@@ -163,6 +163,55 @@ export async function companyPay(amount) {
     return true;
   }
   throw new Error(data.message);
+}
+
+function prepareUserInfo(data) {
+  data.video = {
+    url: data.us_auth_video.play_url,
+    pic: data.us_auth_video.cover_url,
+  };
+  data.card = {};
+  if (data.ts_account_cards[0]) {
+    data.card.bank_card_no = data.ts_account_cards[0].bank_card_no;
+    data.card.bank_card_name = data.ts_account_cards[0].bank_name;
+    data.card.mobile = data.ts_account_cards[0].mobile;
+  }
+  const location = data.location.split(',').slice(0, 2);
+  data.map = {
+    zoom: 11,
+    center: location,
+    marker: {
+      position: location,
+      visible: true,
+      draggable: false,
+    },
+    plugin: [{
+      pName: 'ToolBar',
+    }],
+  };
+}
+
+export async function getUserInfo(uid) {
+  const data = await axios
+    .all([
+      axios.get(`/api/user?uid=${uid}`),
+      axios.get(`/api/user_call_records?uid=${uid}`),
+      axios.get(`/api/sms?uid=${uid}`),
+      axios.get(`/api/pay_info?uid=${uid}`),
+    ])
+    .then(axios.spread((user, callRecords, sms, payInfo) => {
+      return Object.assign(user.data, {
+        callRecords: callRecords.data,
+        sms: sms.data,
+        payInfo: {
+          sina: payInfo.data[1],
+          bf: payInfo.data[0],
+        },
+      });
+    }));
+
+  prepareUserInfo(data);
+  return data;
 }
 
 export function handleError(error, showMsg) {

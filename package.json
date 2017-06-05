@@ -17,7 +17,9 @@
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "vue": "^2.2.2",
+    "vue-amap": "^0.2.7",
     "vue-axios": "^2.0.1",
+    "vue-dplayer": "0.0.2",
     "vue-router": "^2.3.0",
     "vuex": "^2.3.1"
   },

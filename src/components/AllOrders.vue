@@ -136,7 +136,7 @@
     eliminateOrder,
     handleError,
   } from '../common/services';
-  import calcOverdueDays from '../common/utils';
+  import { calcOverdueDays } from '../common/utils';
 
   let query = {
     channel: 'jiaoyouweidai',
