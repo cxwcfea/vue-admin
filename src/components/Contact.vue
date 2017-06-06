@@ -1,8 +1,8 @@
 <template>
   <el-card :body-style="{ padding: '0px' }">
     <div slot="header" class="clearfix">
-      通讯录姓名: <span style="line-height: 36px; font-size: 18px;">{{ info.name }}</span>
-      <span style="line-height: 36px; font-size: 18px; float: right">{{ info.mobile }}</span>
+      通讯录姓名: <span style="line-height: 36px; font-size: 20px;">{{ info.name }}</span>
+      <span style="line-height: 36px; font-size: 20px; float: right">{{ info.mobile }}</span>
     </div>
     <div style="padding: 14px;">
       <el-collapse>
@@ -44,6 +44,7 @@
       </el-collapse>
       <div class="bottom clearfix">
         <el-tag type="danger" v-for="(tag, index) in info.tags" :key="index">{{ tag }}</el-tag>
+        <el-tag type="success" v-if="info.relation">联系人-{{ info.relation | linkmanRelation }}</el-tag>
         <el-button type="text" class="button">短信记录</el-button>
         <el-button type="text" class="button">通话记录</el-button>
       </div>

@@ -109,6 +109,25 @@ function smsDirection(val) {
   }
 }
 
+function linkmanRelation(val) {
+  switch (val) {
+    case 101:
+      return '父母';
+    case 102:
+      return '配偶';
+    case 103:
+      return '兄妹';
+    case 201:
+      return '同学';
+    case 202:
+      return '同事';
+    case 203:
+      return '朋友';
+    default:
+      return '未知';
+  }
+}
+
 export {
   dateFormatter,
   gender,
@@ -120,4 +139,5 @@ export {
   mobileOS,
   callDirection,
   smsDirection,
+  linkmanRelation,
 };

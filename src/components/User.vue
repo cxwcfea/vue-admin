@@ -1,6 +1,6 @@
 <template>
   <section class="main" v-if="user">
-    <el-tabs type="border-card">
+    <el-tabs type="border-card" @tab-click="handleTabClick">
       <el-tab-pane label="基本资料">
         <el-row :gutter="30">
           <el-col :sm="12" :md="6">
@@ -191,7 +191,8 @@
             <el-form-item>
               <el-button type="primary" icon="search" @click="queryContact">查询</el-button>
               <el-button type="danger" @click="showCollector">疑似催收</el-button>
-              <el-button type="success" @click="resetSearch"><i class="fa fa-refresh"></i></el-button>
+              <el-button type="success" @click="showLinkman">联系人</el-button>
+              <el-button type="primary" @click="resetSearch"><i class="fa fa-refresh"></i></el-button>
             </el-form-item>
             <el-form-item style="float: right;">
               <span>共 {{ currentContacts.length }} 条</span>
@@ -251,7 +252,23 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="运营商数据">
-
+        <el-row v-if="featureTabInit && user.userCallStatistics">
+          <el-col :span="12">
+            <feature-chart type="cnt" :statistics="user.userCallStatistics.callcnt"></feature-chart>
+          </el-col>
+          <el-col :span="12">
+            <feature-chart type="time" :statistics="user.userCallStatistics.calltime"></feature-chart>
+          </el-col>
+        </el-row>
+        <el-alert
+          title="没有数据"
+          description="运营商爬取失败或者用户还未授权"
+          type="error"
+          show-icon
+          :closable="false"
+          v-else
+        >
+        </el-alert>
       </el-tab-pane>
     </el-tabs>
 
@@ -266,6 +283,7 @@
   import VueDPlayer from 'vue-dplayer';
   import PhotoViewer from './PhotoViewer';
   import Contact from './Contact';
+  import FeatureChart from './FeatureChart';
   import { collectNums, redKeywords } from '../common/constants';
   import { dateFormatter } from '../common/filter';
   import { buildSmsKeywordMap } from '../common/utils';
@@ -281,6 +299,7 @@
     components: {
       photoViewer: PhotoViewer,
       contact: Contact,
+      featureChart: FeatureChart,
       'd-player': VueDPlayer,
     },
     data() {
@@ -291,6 +310,7 @@
         },
         contactMobile: '',
         onlyCollector: false,
+        onlyLinkman: false,
         rules: {
           mobile: [
             { required: true, message: '请输入手机号', trigger: 'blur' },
@@ -301,6 +321,7 @@
         redKeywordsMap: {},
         user: null,
         userContacts: [],
+        featureTabInit: false,
       };
     },
     computed: {
@@ -310,6 +331,9 @@
       currentContacts() {
         if (this.onlyCollector === true) {
           return this.userContacts.filter(elem => collectNumSet.has(elem.mobile));
+        }
+        if (this.onlyLinkman === true) {
+          return this.userContacts.filter(elem => elem.relation != null);
         }
         if (this.contactMobile) {
           return this.userContacts.filter(elem => elem.mobile === this.contactMobile);
@@ -322,7 +346,12 @@
       dateFormatter(row, column) {
         return dateFormatter(row[column.property]);
       },
-      prepareUserContactData(addressBook, callRecords, sms) {
+      handleTabClick(tab) {
+        if (tab.index === '4' && !this.featureTabInit) {
+          this.featureTabInit = true;
+        }
+      },
+      prepareUserContactData(addressBook, callRecords, sms, linkman) {
         addressBook.forEach((elem) => {
           const contact = contactMap[elem.mobile];
           if (contact) {
@@ -377,9 +406,16 @@
           .sortBy(elem => elem.totalCallTime)
           .reverse()
           .value();
+
         this.userContacts.forEach((elem) => {
           if (collectNumSet.has(elem.mobile)) {
             elem.tags.push('催收');
+          }
+          for (let i = 0; i < linkman.length; i += 1) {
+            if (linkman[i].mobile === elem.mobile) {
+              elem.relation = linkman[i].relation;
+              break;
+            }
           }
         });
       },
@@ -397,10 +433,14 @@
         this.contactMobile = '';
         this.contactQuery.mobile = '';
         this.onlyCollector = false;
+        this.onlyLinkman = false;
         this.showingSms = this.user.sms;
       },
       showCollector() {
         this.onlyCollector = true;
+      },
+      showLinkman() {
+        this.onlyLinkman = true;
       },
       onKeySelected(keyword) {
         this.showingSms = this.redKeywordsMap[keyword];
@@ -412,7 +452,7 @@
         const user = await getUserInfo(uid);
         this.user = user;
         this.prepareUserContactData(
-          user.us_address_books, user.callRecords, user.sms,
+          user.us_address_books, user.callRecords, user.sms, user.us_contacts,
         );
         this.showingSms = user.sms.map((elem) => {
           elem.count = contactMap[elem.mobile].sms.length;

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import axios from 'axios';
-import { calcOverdueDays } from './utils';
+import { calcOverdueDays, extractCallStatistics } from './utils';
 
 export async function requestRiskCheck(loan) {
   const res = await axios.get(`/api/request_risk_check?uid=${loan.user_id_fk}&oid=${loan.id}`);
@@ -189,6 +189,14 @@ function prepareUserInfo(data) {
       pName: 'ToolBar',
     }],
   };
+  data.userFeatures = _.groupBy(data.features.data, (elem) => {
+    return elem.name.split('_')[0];
+  });
+  if (!data.features.data) {
+    data.userCallStatistics = null;
+  } else {
+    data.userCallStatistics = extractCallStatistics(data.features.data);
+  }
 }
 
 export async function getUserInfo(uid) {
@@ -198,8 +206,9 @@ export async function getUserInfo(uid) {
       axios.get(`/api/user_call_records?uid=${uid}`),
       axios.get(`/api/sms?uid=${uid}`),
       axios.get(`/api/pay_info?uid=${uid}`),
+      axios.get(`/api/feature/userFeatures?uid=${uid}`),
     ])
-    .then(axios.spread((user, callRecords, sms, payInfo) => {
+    .then(axios.spread((user, callRecords, sms, payInfo, features) => {
       return Object.assign(user.data, {
         callRecords: callRecords.data,
         sms: sms.data,
@@ -207,6 +216,7 @@ export async function getUserInfo(uid) {
           sina: payInfo.data[1],
           bf: payInfo.data[0],
         },
+        features: features.data,
       });
     }));
 
