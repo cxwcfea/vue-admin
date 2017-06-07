@@ -42,6 +42,12 @@
                 <el-col :span="12" class="item">
                   <span class="key">工作地址</span>: {{user.company_address}},{{user.company_city}}
                 </el-col>
+                <el-col :span="12" class="item">
+                  <span class="key" style="color: #FF4949">完成贷款</span>: <el-tag>{{user.order_count}}</el-tag>
+                </el-col>
+                <el-col :span="12" class="item">
+                  <span class="key" style="color: #FF4949">腾讯得分</span>: <el-tag>{{tencentScore}}</el-tag>
+                </el-col>
               </el-row>
             </el-card>
             <el-card class="box-card">
@@ -82,7 +88,7 @@
             <d-player :video="user.video"></d-player>
           </el-col>
           <el-col :span="16">
-            <div class="amap-page-container">
+            <div class="amap-page-container" v-if="user.map">
               <el-amap vid="amapDemo" :zoom="user.map.zoom" :center="user.map.center" class="amap-demo">
                 <el-amap-marker :position="user.map.marker.position" :visible="user.map.marker.visible" :draggable="user.map.marker.draggable"></el-amap-marker>
               </el-amap>
@@ -317,6 +323,7 @@
   import {
     getUserInfo,
     getUserCarrierInfo,
+    getTencentScore,
     handleError,
   } from '../common/services';
 
@@ -354,6 +361,7 @@
         featureTabInit: false,
         carrierRecordsLength: 0,
         carrierSortType: null,
+        tencentScore: -1,
       };
     },
     computed: {
@@ -450,6 +458,7 @@
         );
         const carrierContacts = prepareUserContactData(carrierContactMap);
         this.carrierContacts = carrierContacts.filter(elem => elem.call.length > 0);
+        this.tencentScore = await getTencentScore(this.user);
       } catch (err) {
         handleError(err, this.$message);
       }

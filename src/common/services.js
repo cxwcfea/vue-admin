@@ -254,6 +254,26 @@ export async function getUserCarrierInfo(uid, mobile) {
   return carrierInfo;
 }
 
+export async function getTencentScore(user) {
+  const data = {
+    mobile: user.mobile,
+    ip: user.IP,
+    imei: user.imei,
+    idNo: user.ic_number,
+    name: user.name,
+    address: user.address,
+  };
+  if (user.card && user.card.bank_card_no) {
+    data.cardNo = user.card.bank_card_no;
+  }
+  const { data: res } = await axios.post('/api/data/tencent_risk_check', data);
+  if (res.data) {
+    return res.data.evil_level;
+  }
+
+  return -1;
+}
+
 export function handleError(error, showMsg) {
   let message = error.message;
   if (error.response) {
