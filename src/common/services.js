@@ -1,6 +1,9 @@
 import _ from 'lodash';
 import axios from 'axios';
-import { calcOverdueDays, extractCallStatistics } from './utils';
+import {
+  calcOverdueDays,
+  extractCallStatistics,
+} from './utils';
 
 export async function requestRiskCheck(loan) {
   const res = await axios.get(`/api/request_risk_check?uid=${loan.user_id_fk}&oid=${loan.id}`);
@@ -189,14 +192,27 @@ function prepareUserInfo(data) {
       pName: 'ToolBar',
     }],
   };
-  data.userFeatures = _.groupBy(data.features.data, (elem) => {
+}
+
+function prepareCarrierInfo(data) {
+  data.userFeatures = _.groupBy(data.feature, (elem) => {
     return elem.name.split('_')[0];
   });
-  if (!data.features.data) {
+  if (!data.feature) {
     data.userCallStatistics = null;
   } else {
-    data.userCallStatistics = extractCallStatistics(data.features.data);
+    data.userCallStatistics = extractCallStatistics(data.feature);
   }
+
+  data.compatibleRecords = data.callRecords.map((elem) => {
+    return {
+      mobile: elem.callMobile,
+      duration: elem.callTimeCost,
+      direction: elem.callType,
+      create_time: elem.callTime,
+      area: `${elem.callArea} ${elem.province}`,
+    };
+  });
 }
 
 export async function getUserInfo(uid) {
@@ -222,6 +238,20 @@ export async function getUserInfo(uid) {
 
   prepareUserInfo(data);
   return data;
+}
+
+export async function getUserCarrierInfo(uid, mobile) {
+  const carrierInfo = await axios
+    .all([
+      axios.get(`/api/feature/userFeatures?uid=${uid}`),
+      axios.get(`/api/carrier_data?mobile=${mobile}`),
+    ])
+    .then(axios.spread((features, data) => {
+      return { feature: features.data.data, callRecords: data.data };
+    }));
+
+  prepareCarrierInfo(carrierInfo);
+  return carrierInfo;
 }
 
 export function handleError(error, showMsg) {

@@ -50,6 +50,8 @@ export const collectNums = [
   '02180356344',
 ];
 
+export const collectNumSet = new Set(collectNums);
+
 export const redKeywords = [
   '微贷',
   '恶意',

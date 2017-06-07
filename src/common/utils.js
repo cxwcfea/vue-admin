@@ -1,5 +1,6 @@
 import moment from 'moment';
 import _ from 'lodash';
+import { collectNumSet } from '../common/constants';
 
 export function calcOverdueDays(subLoan) {
   let repayDay = moment();
@@ -154,4 +155,85 @@ export function extractCallStatistics(features) {
     callcnt: [callcntAggData, callcntAggDataIn, callcntAggDataOut],
     calltime: [calltimeAggData, calltimeAggDataIn, calltimeAggDataOut],
   };
+}
+
+export function buildContactMap(addressBook, callRecords, sms) {
+  const contactMap = {};
+
+  addressBook.forEach((elem) => {
+    const contact = contactMap[elem.mobile];
+    if (contact) {
+      if (elem.name !== contact.name) {
+        contact.name += ` | ${elem.name}`;
+      }
+    } else {
+      contactMap[elem.mobile] = {
+        name: elem.name,
+        mobile: elem.mobile,
+        call: [],
+        sms: [],
+        totalCallTime: 0,
+        tags: [],
+      };
+    }
+  });
+
+  callRecords.forEach((elem) => {
+    const contact = contactMap[elem.mobile];
+    if (contact) {
+      contact.call.push(elem);
+      contact.totalCallTime += elem.duration;
+    } else {
+      contactMap[elem.mobile] = {
+        name: '',
+        mobile: elem.mobile,
+        call: [elem],
+        sms: [],
+        totalCallTime: elem.duration,
+        tags: [],
+      };
+    }
+  });
+
+  if (sms) {
+    sms.forEach((elem) => {
+      const contact = contactMap[elem.mobile];
+      if (contact) {
+        contact.sms.push(elem);
+      } else {
+        contactMap[elem.mobile] = {
+          name: '',
+          mobile: elem.mobile,
+          call: [],
+          sms: [elem],
+          totalCallTime: 0,
+          tags: [],
+        };
+      }
+    });
+  }
+
+  return contactMap;
+}
+
+export function prepareUserContactData(contactMap, linkman) {
+  const userContacts = _(contactMap)
+    .values()
+    .sortBy(elem => elem.totalCallTime)
+    .reverse()
+    .value();
+
+  userContacts.forEach((elem) => {
+    if (collectNumSet.has(elem.mobile)) {
+      elem.tags.push('催收');
+    }
+    for (let i = 0; linkman && i < linkman.length; i += 1) {
+      if (linkman[i].mobile === elem.mobile) {
+        elem.relation = linkman[i].relation;
+        break;
+      }
+    }
+  });
+
+  return userContacts;
 }

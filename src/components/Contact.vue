@@ -26,12 +26,17 @@
             <el-table-column
               label="发生时间">
               <template scope="scope">
-                <span style="">{{ scope.row.creat_time | dateFormatter }}</span>
+                <span style="">{{ scope.row.create_time | dateFormatter }}</span>
               </template>
+            </el-table-column>
+            <el-table-column
+              v-if="!showSms"
+              prop="area"
+              label="地域">
             </el-table-column>
           </el-table>
         </el-collapse-item>
-        <el-collapse-item name="2">
+        <el-collapse-item name="2" v-if="showSms">
           <template slot="title">
             短信记录 <el-tag type="success">{{ info.sms ? info.sms.length : 0 }}</el-tag>
           </template>
@@ -54,7 +59,14 @@
 
 <script>
   export default {
-    props: ['info'],
+    props: {
+      info: {
+        required: true,
+      },
+      showSms: {
+        default: true,
+      },
+    },
     data() {
       return {
       };

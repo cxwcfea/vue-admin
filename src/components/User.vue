@@ -182,20 +182,20 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="手机通讯录">
+      <el-tab-pane>
+        <span slot="label">
+          手机通讯录 <el-badge class="mark" :value="user.callRecords.length" />
+        </span>
         <el-row style="margin-left: 8px">
           <el-form :inline="true" :model="contactQuery" :rules="rules" ref="contactSearchForm">
             <el-form-item prop="mobile">
               <el-input v-model="contactQuery.mobile" placeholder="手机号"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" icon="search" @click="queryContact">查询</el-button>
+              <el-button type="primary" icon="search" @click="queryContact('contactSearchForm')">查询</el-button>
               <el-button type="danger" @click="showCollector">疑似催收</el-button>
               <el-button type="success" @click="showLinkman">联系人</el-button>
               <el-button type="primary" @click="resetSearch"><i class="fa fa-refresh"></i></el-button>
-            </el-form-item>
-            <el-form-item style="float: right;">
-              <span>共 {{ currentContacts.length }} 条</span>
             </el-form-item>
           </el-form>
         </el-row>
@@ -252,14 +252,37 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="运营商数据">
-        <el-row v-if="featureTabInit && user.userCallStatistics">
-          <el-col :span="12">
-            <feature-chart type="cnt" :statistics="user.userCallStatistics.callcnt"></feature-chart>
-          </el-col>
-          <el-col :span="12">
-            <feature-chart type="time" :statistics="user.userCallStatistics.calltime"></feature-chart>
-          </el-col>
-        </el-row>
+        <span slot="label">
+          运营商数据 <el-badge class="mark" :value="carrierRecordsLength" />
+        </span>
+        <div v-if="featureTabInit && user.carrierInfo.userCallStatistics">
+          <el-row>
+            <el-col :span="12">
+              <feature-chart type="cnt" :statistics="user.carrierInfo.userCallStatistics.callcnt"></feature-chart>
+            </el-col>
+            <el-col :span="12">
+              <feature-chart type="time" :statistics="user.carrierInfo.userCallStatistics.calltime"></feature-chart>
+            </el-col>
+          </el-row>
+          <el-row style="margin-left: 8px;margin-top: 5px">
+            <el-form :inline="true" :model="carrierContactQuery" :rules="rules" ref="carrierContactSearchForm">
+              <el-form-item prop="mobile">
+                <el-input v-model="carrierContactQuery.mobile" placeholder="手机号"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" icon="search" @click="queryContact('carrierContactSearchForm')">查询</el-button>
+                <el-button type="primary" @click="resetSearch"><i class="fa fa-refresh"></i></el-button>
+                <el-button @click="carrierSortType = 'time'">按时长排序</el-button>
+                <el-button @click="carrierSortType = 'cnt'">按次数排序</el-button>
+              </el-form-item>
+            </el-form>
+          </el-row>
+          <el-row>
+            <el-col :span="12" v-for="item in currentCarrierContacts" :key="item.mobile" class="contact">
+              <contact :info="item" :showSms="false"></contact>
+            </el-col>
+          </el-row>
+        </div>
         <el-alert
           title="没有数据"
           description="运营商爬取失败或者用户还未授权"
@@ -284,16 +307,18 @@
   import PhotoViewer from './PhotoViewer';
   import Contact from './Contact';
   import FeatureChart from './FeatureChart';
-  import { collectNums, redKeywords } from '../common/constants';
+  import { collectNumSet, redKeywords } from '../common/constants';
   import { dateFormatter } from '../common/filter';
-  import { buildSmsKeywordMap } from '../common/utils';
+  import {
+    buildSmsKeywordMap,
+    buildContactMap,
+    prepareUserContactData,
+  } from '../common/utils';
   import {
     getUserInfo,
+    getUserCarrierInfo,
     handleError,
   } from '../common/services';
-
-  const collectNumSet = new Set(collectNums);
-  const contactMap = {};
 
   export default {
     components: {
@@ -308,7 +333,11 @@
         contactQuery: {
           mobile: '',
         },
+        carrierContactQuery: {
+          mobile: '',
+        },
         contactMobile: '',
+        carrierContactMobile: '',
         onlyCollector: false,
         onlyLinkman: false,
         rules: {
@@ -321,12 +350,26 @@
         redKeywordsMap: {},
         user: null,
         userContacts: [],
+        carrierContacts: [],
         featureTabInit: false,
+        carrierRecordsLength: 0,
+        carrierSortType: null,
       };
     },
     computed: {
       modelSearchLink() {
         return `https://www.baidu.com/s?wd=${this.user.model}`;
+      },
+      currentCarrierContacts() {
+        if (this.carrierSortType === 'time') {
+          return this.$_.sortBy(this.carrierContacts, elem => elem.totalCallTime).reverse();
+        } else if (this.carrierSortType === 'cnt') {
+          return this.$_.sortBy(this.carrierContacts, elem => elem.call.length).reverse();
+        }
+        if (this.carrierContactMobile) {
+          return this.carrierContacts.filter(elem => elem.mobile === this.carrierContactMobile);
+        }
+        return this.carrierContacts;
       },
       currentContacts() {
         if (this.onlyCollector === true) {
@@ -351,78 +394,15 @@
           this.featureTabInit = true;
         }
       },
-      prepareUserContactData(addressBook, callRecords, sms, linkman) {
-        addressBook.forEach((elem) => {
-          const contact = contactMap[elem.mobile];
-          if (contact) {
-            if (elem.name !== contact.name) {
-              contact.name += ` | ${elem.name}`;
-            }
-          } else {
-            contactMap[elem.mobile] = {
-              name: elem.name,
-              mobile: elem.mobile,
-              call: [],
-              sms: [],
-              totalCallTime: 0,
-              tags: [],
-            };
-          }
-        });
-        callRecords.forEach((elem) => {
-          const contact = contactMap[elem.mobile];
-          if (contact) {
-            contact.call.push(elem);
-            contact.totalCallTime += elem.duration;
-          } else {
-            contactMap[elem.mobile] = {
-              name: '',
-              mobile: elem.mobile,
-              call: [elem],
-              sms: [],
-              totalCallTime: elem.duration,
-              tags: [],
-            };
-          }
-        });
-        sms.forEach((elem) => {
-          const contact = contactMap[elem.mobile];
-          if (contact) {
-            contact.sms.push(elem);
-          } else {
-            contactMap[elem.mobile] = {
-              name: '',
-              mobile: elem.mobile,
-              call: [],
-              sms: [elem],
-              totalCallTime: 0,
-              tags: [],
-            };
-          }
-        });
-        this.userContacts = this
-          .$_(contactMap)
-          .values()
-          .sortBy(elem => elem.totalCallTime)
-          .reverse()
-          .value();
-
-        this.userContacts.forEach((elem) => {
-          if (collectNumSet.has(elem.mobile)) {
-            elem.tags.push('催收');
-          }
-          for (let i = 0; i < linkman.length; i += 1) {
-            if (linkman[i].mobile === elem.mobile) {
-              elem.relation = linkman[i].relation;
-              break;
-            }
-          }
-        });
-      },
-      queryContact() {
-        this.$refs.contactSearchForm.validate((valid) => {
+      queryContact(formName) {
+        this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.contactMobile = this.contactQuery.mobile;
+            if (this.contactQuery.mobile) {
+              this.contactMobile = this.contactQuery.mobile;
+            }
+            if (this.carrierContactQuery.mobile) {
+              this.carrierContactMobile = this.carrierContactQuery.mobile;
+            }
             return true;
           }
 
@@ -432,6 +412,8 @@
       resetSearch() {
         this.contactMobile = '';
         this.contactQuery.mobile = '';
+        this.carrierContactMobile = '';
+        this.carrierContactQuery.mobile = '';
         this.onlyCollector = false;
         this.onlyLinkman = false;
         this.showingSms = this.user.sms;
@@ -449,18 +431,25 @@
     async mounted() {
       const uid = this.$route.params.id;
       try {
-        const user = await getUserInfo(uid);
-        this.user = user;
-        this.prepareUserContactData(
-          user.us_address_books, user.callRecords, user.sms, user.us_contacts,
+        this.user = await getUserInfo(uid);
+        const contactMap = buildContactMap(
+          this.user.us_address_books, this.user.callRecords, this.user.sms,
         );
-        this.showingSms = user.sms.map((elem) => {
+        this.userContacts = prepareUserContactData(contactMap, this.user.us_contacts);
+        this.showingSms = this.user.sms.map((elem) => {
           elem.count = contactMap[elem.mobile].sms.length;
           elem.name = contactMap[elem.mobile].name;
           return elem;
         });
         this.redKeywordsMap = buildSmsKeywordMap(this.showingSms, redKeywords);
-        console.log(user);
+
+        this.user.carrierInfo = await getUserCarrierInfo(uid, this.user.mobile);
+        this.carrierRecordsLength = this.user.carrierInfo.callRecords.length;
+        const carrierContactMap = buildContactMap(
+          this.user.us_address_books, this.user.carrierInfo.compatibleRecords,
+        );
+        const carrierContacts = prepareUserContactData(carrierContactMap);
+        this.carrierContacts = carrierContacts.filter(elem => elem.call.length > 0);
       } catch (err) {
         handleError(err, this.$message);
       }
