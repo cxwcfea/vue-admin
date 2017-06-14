@@ -10,7 +10,7 @@
         </div>
         <user-score-list :uid="user.id"></user-score-list>
       </el-card>
-      <el-card class="box-card" v-if="user.currentOrder && user.currentOrder.status_id_fk === 1210">
+      <el-card class="box-card" v-if="order && order.status_id_fk === 1201">
         <div slot="header" class="clearfix">
           <span style="line-height: 22px;">风控审核</span>
         </div>
@@ -44,8 +44,12 @@
       user: {
         required: true,
       },
+      order: {
+        default() {
+          return {};
+        },
+      },
     },
-    data() {},
     components: {
       userReview: UserReview,
       userScoreList: UserScoreList,
@@ -59,7 +63,7 @@
         reviewUser({
           mobile: this.user.mobile,
           user_id_fk: this.user.id,
-          order_serial_num: this.user.currentOrder.id,
+          order_serial_num: this.order.id,
           score: data.score,
           reason: data.reason,
         }).then(() => {
@@ -77,7 +81,7 @@
           uid: this.user.id,
           mobile: this.user.mobile,
           approve,
-          order: this.user.currentOrder.id,
+          order: this.order.id,
         };
         if (reason) {
           body.reason = reason;

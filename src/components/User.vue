@@ -261,14 +261,24 @@
         <span slot="label">
           运营商数据 <el-badge class="mark" :value="carrierRecordsLength" />
         </span>
-        <div v-if="featureTabInit && user.carrierInfo.userCallStatistics">
-          <el-row>
+        <div>
+          <el-row v-if="featureTabInit && user.carrierInfo.userCallStatistics">
             <el-col :span="12">
               <feature-chart type="cnt" :statistics="user.carrierInfo.userCallStatistics.callcnt"></feature-chart>
             </el-col>
             <el-col :span="12">
               <feature-chart type="time" :statistics="user.carrierInfo.userCallStatistics.calltime"></feature-chart>
             </el-col>
+          </el-row>
+          <el-row v-else>
+            <el-alert
+              title="没有数据"
+              description="运营商爬取失败或者用户还未授权"
+              type="error"
+              show-icon
+              :closable="false"
+              style="margin-bottom: 8px">
+            </el-alert>
           </el-row>
           <el-row style="margin-left: 8px;margin-top: 5px">
             <el-form :inline="true" :model="carrierContactQuery" :rules="rules" ref="carrierContactSearchForm">
@@ -289,18 +299,9 @@
             </el-col>
           </el-row>
         </div>
-        <el-alert
-          title="没有数据"
-          description="运营商爬取失败或者用户还未授权"
-          type="error"
-          show-icon
-          :closable="false"
-          v-else
-        >
-        </el-alert>
       </el-tab-pane>
       <el-tab-pane label="用户审核">
-        <risk-control :user="user"></risk-control>
+        <risk-control :user="user" :order="user.currentOrder"></risk-control>
       </el-tab-pane>
     </el-tabs>
 
@@ -460,6 +461,15 @@
         });
         this.redKeywordsMap = buildSmsKeywordMap(this.showingSms, redKeywords);
 
+        const orders = await this.loadUserOrders(this.user.id);
+        if (orders[0]) {
+          this.user.currentOrder = orders[0];
+        }
+      } catch (err) {
+        handleError(err, this.$message);
+      }
+
+      try {
         this.user.carrierInfo = await getUserCarrierInfo(uid, this.user.mobile);
         this.carrierRecordsLength = this.user.carrierInfo.callRecords.length;
         const carrierContactMap = buildContactMap(
@@ -467,12 +477,12 @@
         );
         const carrierContacts = prepareUserContactData(carrierContactMap);
         this.carrierContacts = carrierContacts.filter(elem => elem.call.length > 0);
-        this.tencentScore = await getTencentScore(this.user);
+      } catch (err) {
+        handleError(err, this.$message);
+      }
 
-        const orders = await this.loadUserOrders(this.user.id);
-        if (orders[0]) {
-          this.user.currentOrder = orders[0];
-        }
+      try {
+        this.tencentScore = await getTencentScore(this.user);
       } catch (err) {
         handleError(err, this.$message);
       }
