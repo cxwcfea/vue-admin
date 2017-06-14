@@ -1,162 +1,107 @@
 <template>
-  <el-row>
+  <el-row :gutter="20">
     <el-col :span="12">
-      <my-chart type="cnt" :statistics="features" v-if="features"></my-chart>
+      <user-review @submitReview="onReviewSubmit"></user-review>
     </el-col>
     <el-col :span="12">
-      <my-chart type="time" :statistics="features" v-if="features"></my-chart>
+      <el-card class="box-card">
+        <div slot="header" class="clearfix">
+          <span style="line-height: 22px;">历史记录</span>
+        </div>
+        <user-score-list :uid="1"></user-score-list>
+      </el-card>
+      <el-card class="box-card">
+        <div slot="header" class="clearfix">
+          <span style="line-height: 22px;">风控审核</span>
+        </div>
+        <user-risk-check :uid="1" @submitUserCheckResult="onSubmitUserCheckResult"></user-risk-check>
+      </el-card>
     </el-col>
   </el-row>
 </template>
 
 <script>
-  import Chart from './FeatureChart';
+  import { mapActions } from 'vuex';
+  import UserReview from './UserReview';
+  import UserScoreList from './UserScoreList';
+  import UserRiskCheck from './UserRiskCheck';
   import {
+    reviewUser,
+    checkUser,
     handleError,
   } from '../common/services';
 
   export default {
     data() {
       return {
-        features: null,
-        type: 'detail',
+        currentOrder: null,
       };
     },
     components: {
-      myChart: Chart,
+      userReview: UserReview,
+      userScoreList: UserScoreList,
+      userRiskCheck: UserRiskCheck,
     },
-    async mounted() {
-      const uid = 1;
-      try {
-        const { data } = await this.axios.get(`/api/feature/userFeatures?uid=${uid}`);
-        // const userFeatures = this.$_.groupBy(data.data, elem => elem.name.split('_')[0]);
-        const callcntAggData = this.$_.fill(Array(6), 0);
-        const callcntAggDataOut = this.$_.fill(Array(6), 0);
-        const callcntAggDataIn = this.$_.fill(Array(6), 0);
-        const calltimeAggData = this.$_.fill(Array(6), 0);
-        const calltimeAggDataOut = this.$_.fill(Array(6), 0);
-        const calltimeAggDataIn = this.$_.fill(Array(6), 0);
-        data.data.forEach((elem) => {
-          if (elem.name === 'last1m_callcnt_agg') {
-            callcntAggData[5] = elem.value;
-          }
-          if (elem.name === 'second_m_callcnt_agg') {
-            callcntAggData[4] = elem.value;
-          }
-          if (elem.name === 'third_m_callcnt_agg') {
-            callcntAggData[3] = elem.value;
-          }
-          if (elem.name === 'fourth_m_callcnt_agg') {
-            callcntAggData[2] = elem.value;
-          }
-          if (elem.name === 'fifth_m_callcnt_agg') {
-            callcntAggData[1] = elem.value;
-          }
-          if (elem.name === 'sixth_m_callcnt_agg') {
-            callcntAggData[0] = elem.value;
-          }
-          if (elem.name === 'last1m_callcnt_agg_out') {
-            callcntAggDataOut[5] = elem.value;
-          }
-          if (elem.name === 'second_m_callcnt_agg_out') {
-            callcntAggDataOut[4] = elem.value;
-          }
-          if (elem.name === 'third_m_callcnt_agg_out') {
-            callcntAggDataOut[3] = elem.value;
-          }
-          if (elem.name === 'fourth_m_callcnt_agg_out') {
-            callcntAggDataOut[2] = elem.value;
-          }
-          if (elem.name === 'fifth_m_callcnt_agg_out') {
-            callcntAggDataOut[1] = elem.value;
-          }
-          if (elem.name === 'sixth_m_callcnt_agg_out') {
-            callcntAggDataOut[0] = elem.value;
-          }
-          if (elem.name === 'last1m_callcnt_agg_in') {
-            callcntAggDataIn[5] = elem.value;
-          }
-          if (elem.name === 'second_m_callcnt_agg_in') {
-            callcntAggDataIn[4] = elem.value;
-          }
-          if (elem.name === 'third_m_callcnt_agg_in') {
-            callcntAggDataIn[3] = elem.value;
-          }
-          if (elem.name === 'fourth_m_callcnt_agg_in') {
-            callcntAggDataIn[2] = elem.value;
-          }
-          if (elem.name === 'fifth_m_callcnt_agg_in') {
-            callcntAggDataIn[1] = elem.value;
-          }
-          if (elem.name === 'sixth_m_callcnt_agg_in') {
-            callcntAggDataIn[0] = elem.value;
-          }
-          if (elem.name === 'last1m_calltime_agg') {
-            calltimeAggData[5] = elem.value;
-          }
-          if (elem.name === 'second_m_calltime_agg') {
-            calltimeAggData[4] = elem.value;
-          }
-          if (elem.name === 'third_m_calltime_agg') {
-            calltimeAggData[3] = elem.value;
-          }
-          if (elem.name === 'fourth_m_calltime_agg') {
-            calltimeAggData[2] = elem.value;
-          }
-          if (elem.name === 'fifth_m_calltime_agg') {
-            calltimeAggData[1] = elem.value;
-          }
-          if (elem.name === 'sixth_m_calltime_agg') {
-            calltimeAggData[0] = elem.value;
-          }
-          if (elem.name === 'last1m_calltime_agg_out') {
-            calltimeAggDataOut[5] = elem.value;
-          }
-          if (elem.name === 'second_m_calltime_agg_out') {
-            calltimeAggDataOut[4] = elem.value;
-          }
-          if (elem.name === 'third_m_calltime_agg_out') {
-            calltimeAggDataOut[3] = elem.value;
-          }
-          if (elem.name === 'fourth_m_calltime_agg_out') {
-            calltimeAggDataOut[2] = elem.value;
-          }
-          if (elem.name === 'fifth_m_calltime_agg_out') {
-            calltimeAggDataOut[1] = elem.value;
-          }
-          if (elem.name === 'sixth_m_calltime_agg_out') {
-            calltimeAggDataOut[0] = elem.value;
-          }
-          if (elem.name === 'last1m_calltime_agg_in') {
-            calltimeAggDataIn[5] = elem.value;
-          }
-          if (elem.name === 'second_m_calltime_agg_in') {
-            calltimeAggDataIn[4] = elem.value;
-          }
-          if (elem.name === 'third_m_calltime_agg_in') {
-            calltimeAggDataIn[3] = elem.value;
-          }
-          if (elem.name === 'fourth_m_calltime_agg_in') {
-            calltimeAggDataIn[2] = elem.value;
-          }
-          if (elem.name === 'fifth_m_calltime_agg_in') {
-            calltimeAggDataIn[1] = elem.value;
-          }
-          if (elem.name === 'sixth_m_calltime_agg_in') {
-            calltimeAggDataIn[0] = elem.value;
-          }
+    methods: {
+      ...mapActions([
+        'loadUserOrders',
+      ]),
+      onReviewSubmit(data) {
+        reviewUser({
+          mobile: '13439695920',
+          user_id_fk: 1,
+          order_serial_num: this.currentOrder.id,
+          score: data.score,
+          reason: data.reason,
+        }).then(() => {
+          this.$message({
+            type: 'success',
+            message: '请求成功',
+          });
+        }).catch((err) => {
+          handleError(err, this.$message);
         });
-        this.type = 'time';
-        this.features = [calltimeAggData, calltimeAggDataIn, calltimeAggDataOut];
-//        callcntAggData = [128, 74, 65, 97, 231, 38];
-//        callcntAggDataIn = [64, 30, 25, 37, 111, 18];
-//        callcntAggDataOut = [64, 44, 40, 60, 120, 20];
-      } catch (err) {
-        handleError(err, this.$message);
-      }
+      },
+      onSubmitUserCheckResult(data) {
+        const { approve, reason } = data;
+        const body = {
+          uid: 1,
+          mobile: '13439695920',
+          approve,
+          order: this.currentOrder.id,
+        };
+        if (reason) {
+          body.reason = reason;
+        }
+        checkUser(body)
+          .then((result) => {
+            this.$message({
+              type: 'success',
+              message: result.msg,
+            });
+          })
+          .catch((err) => {
+            handleError(err, this.$message);
+          });
+      },
+    },
+    mounted() {
+      this
+        .loadUserOrders(1)
+        .then((data) => {
+          this.currentOrder = data[0];
+          console.log(this.currentOrder);
+          // console.log(this.$store.state.order.userOrders);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
   };
 </script>
 
 <style lang="scss" scoped>
+  .box-card {
+    margin-top: 8px;
+  }
 </style>

@@ -299,6 +299,9 @@
         >
         </el-alert>
       </el-tab-pane>
+      <el-tab-pane label="用户审核">
+        <risk-control :user="user"></risk-control>
+      </el-tab-pane>
     </el-tabs>
 
     <el-dialog title="照片查看" v-model="dialogPhotoVisible">
@@ -309,10 +312,12 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex';
   import VueDPlayer from 'vue-dplayer';
   import PhotoViewer from './PhotoViewer';
   import Contact from './Contact';
   import FeatureChart from './FeatureChart';
+  import RiskControl from './RiskControl';
   import { collectNumSet, redKeywords } from '../common/constants';
   import { dateFormatter } from '../common/filter';
   import {
@@ -332,6 +337,7 @@
       photoViewer: PhotoViewer,
       contact: Contact,
       featureChart: FeatureChart,
+      riskControl: RiskControl,
       'd-player': VueDPlayer,
     },
     data() {
@@ -394,6 +400,9 @@
       },
     },
     methods: {
+      ...mapActions([
+        'loadUserOrders',
+      ]),
       dateFormatter(row, column) {
         return dateFormatter(row[column.property]);
       },
@@ -459,6 +468,11 @@
         const carrierContacts = prepareUserContactData(carrierContactMap);
         this.carrierContacts = carrierContacts.filter(elem => elem.call.length > 0);
         this.tencentScore = await getTencentScore(this.user);
+
+        const orders = await this.loadUserOrders(this.user.id);
+        if (orders[0]) {
+          this.user.currentOrder = orders[0];
+        }
       } catch (err) {
         handleError(err, this.$message);
       }

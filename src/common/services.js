@@ -274,6 +274,37 @@ export async function getTencentScore(user) {
   return -1;
 }
 
+export async function getUserOrders(uid) {
+  const { data: orders } = await axios.get(`/api/get_user_orders?uid=${uid}`);
+  return orders;
+}
+
+export async function getUserScoreList(uid) {
+  const { data } = await axios.get(`/api/fetchCheckInfos?user_id_fk=${uid}`);
+  return data;
+}
+
+export async function getUserCreditProfile(uid, isChecking) {
+  const check = isChecking ? 1 : 0;
+  const { data } = await axios.get(`/api/user_credit_profiles?check=${check}&uid=${uid}`);
+  return data;
+}
+
+export async function userHasWaitingLoans(data) {
+  const { data: result } = await axios.get(`/api/waiting_loan_num?uid=${data.uid}`);
+  return result.count > 0;
+}
+
+export async function checkUser(data) {
+  const { data: result } = await axios.post('/api/approve_user', data);
+  return result;
+}
+
+export async function reviewUser(data) {
+  const { data: result } = await axios.post('/api/submit_check_info', data);
+  return result;
+}
+
 export function handleError(error, showMsg) {
   let message = error.message;
   if (error.response) {

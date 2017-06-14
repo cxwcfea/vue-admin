@@ -68,8 +68,7 @@
       },
     },
     data() {
-      return {
-      };
+      return {};
     },
   };
 </script>

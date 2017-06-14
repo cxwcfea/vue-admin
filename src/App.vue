@@ -69,4 +69,8 @@
   .fade-leave-active {
     opacity: 0;
   }
+
+  .el-table .danger-row {
+    background: #FF4949;
+  }
 </style>
