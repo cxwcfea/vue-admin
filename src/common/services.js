@@ -18,14 +18,6 @@ export function getLoanDetail(loan) {
     }));
 }
 
-export function approveToPay(loan) {
-  return axios
-    .post('/api/approve_to_pay', { oid: loan.id, approve: true })
-    .then((res) => {
-      return res.data;
-    });
-}
-
 export async function getOrderDebt(loan) {
   const res = await axios.get(`/api/order_debt?oid=${loan.id}`);
   return res.data.data / 100;
@@ -302,6 +294,38 @@ export async function checkUser(data) {
 
 export async function reviewUser(data) {
   const { data: result } = await axios.post('/api/submit_check_info', data);
+  return result;
+}
+
+export async function getLoanList(offset, limit, query) {
+  let queryStr = '';
+  if (query.status) {
+    queryStr += `&status=${query.status}`;
+  }
+  if (query.search) {
+    queryStr += `&search=${encodeURIComponent(query.search)}`;
+  }
+  if (query.channel) {
+    queryStr += `&channel=${encodeURIComponent(query.channel)}`;
+  }
+  if (query.today) {
+    queryStr += '&today=1';
+  }
+  if (query.dateType) {
+    queryStr += `&dateType=${query.dateType}`;
+  }
+  if (query.date) {
+    queryStr += `&date=${query.date}`;
+  }
+  if (query.oldUser === 1) {
+    queryStr += '&oldUser=1';
+  }
+  const { data } = await axios.get(`/api/loans?offset=${offset}&limit=${limit}${queryStr}`);
+  return data;
+}
+
+export async function approveToPayUser(data) {
+  const { data: result } = await axios.post('/api/approve_to_pay', data);
   return result;
 }
 

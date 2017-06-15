@@ -1,5 +1,6 @@
 import Dashboard from '@/components/Dashboard';
 import Finance from '@/components/Finance';
+import RiskControlList from '@/components/RiskControlList';
 import Test from '@/components/Test';
 import users from './users';
 import orders from './orders';
@@ -32,6 +33,16 @@ const menuState = {
         label: 'Dashboard',
       },
       component: Dashboard,
+    },
+    {
+      name: 'RiskControlList',
+      path: '/risk_control_list',
+      meta: {
+        icon: 'fa-user-secret',
+        label: '待审核列表',
+        roles: ['F_SUPPORT', 'SUPPORT'],
+      },
+      component: RiskControlList,
     },
     {
       name: 'Finance',

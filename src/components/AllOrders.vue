@@ -131,7 +131,7 @@
   import {
     requestRiskCheck,
     getLoanDetail,
-    approveToPay,
+    approveToPayUser,
     getOrderDebt,
     eliminateOrder,
     handleError,
@@ -309,7 +309,7 @@
           cancelButtonText: '取消',
           type: 'warning',
         }).then(
-          () => approveToPay(loan),
+          () => approveToPayUser({ oid: loan.id, approve: true }),
         ).then((data) => {
           this.$message({
             type: 'success',
