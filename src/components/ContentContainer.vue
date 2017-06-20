@@ -12,8 +12,7 @@
       <el-col :span="24" class="content-wrapper">
         <transition
           mode="out-in"
-          name="el-zoom-in-top"
-        >
+          name="el-zoom-in-top">
           <router-view></router-view>
         </transition>
       </el-col>

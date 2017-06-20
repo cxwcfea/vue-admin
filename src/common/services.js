@@ -161,29 +161,33 @@ export async function companyPay(amount) {
 }
 
 function prepareUserInfo(data) {
-  data.video = {
-    url: data.us_auth_video.play_url,
-    pic: data.us_auth_video.cover_url,
-  };
+  if (data.us_auth_video) {
+    data.video = {
+      url: data.us_auth_video.play_url,
+      pic: data.us_auth_video.cover_url,
+    };
+  }
   data.card = {};
   if (data.ts_account_cards[0]) {
     data.card.bank_card_no = data.ts_account_cards[0].bank_card_no;
     data.card.bank_card_name = data.ts_account_cards[0].bank_name;
     data.card.mobile = data.ts_account_cards[0].mobile;
   }
-  const location = data.location.split(',').slice(0, 2);
-  data.map = {
-    zoom: 11,
-    center: location,
-    marker: {
-      position: location,
-      visible: true,
-      draggable: false,
-    },
-    plugin: [{
-      pName: 'ToolBar',
-    }],
-  };
+  if (data.location) {
+    const location = data.location.split(',').slice(0, 2);
+    data.map = {
+      zoom: 11,
+      center: location,
+      marker: {
+        position: location,
+        visible: true,
+        draggable: false,
+      },
+      plugin: [{
+        pName: 'ToolBar',
+      }],
+    };
+  }
 }
 
 function prepareCarrierInfo(data) {
@@ -221,8 +225,8 @@ export async function getUserInfo(uid) {
         callRecords: callRecords.data,
         sms: sms.data,
         payInfo: {
-          sina: payInfo.data[1],
-          bf: payInfo.data[0],
+          sina: payInfo.data[1] || {},
+          bf: payInfo.data[0] || {},
         },
         features: features.data,
       });
@@ -327,6 +331,18 @@ export async function getLoanList(offset, limit, query) {
 export async function approveToPayUser(data) {
   const { data: result } = await axios.post('/api/approve_to_pay', data);
   return result;
+}
+
+export async function getRiskControlList(offset, limit, query) {
+  let queryStr = '';
+  if (query.channel) {
+    queryStr += `&channel=${encodeURIComponent(query.channel)}`;
+  }
+  if (query.oldUser === 1) {
+    queryStr += '&oldUser=1';
+  }
+  const { data } = await axios.get(`/api/risk_control_items?offset=${offset}&limit=${limit}${queryStr}`);
+  return data;
 }
 
 export function handleError(error, showMsg) {

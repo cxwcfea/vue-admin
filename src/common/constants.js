@@ -6,6 +6,10 @@ export const CHANNEL = [
   'ios_weidai',
   'tui',
   'tui_sms',
+  'yingweinuo',
+  '58',
+  'v6',
+  'sina',
 ];
 
 export const ORDER_STATUS = [

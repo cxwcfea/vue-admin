@@ -1,7 +1,7 @@
 <template>
   <section class="main" v-if="user">
-    <el-tabs type="border-card" @tab-click="handleTabClick">
-      <el-tab-pane label="基本资料">
+    <el-tabs type="border-card" @tab-click="handleTabClick" v-model="activeTab">
+      <el-tab-pane label="基本资料" name="basicInfo">
         <el-row :gutter="30">
           <el-col :sm="12" :md="6">
             <el-card :body-style="{ padding: '0px' }">
@@ -85,7 +85,13 @@
         </el-row>
         <el-row :gutter="15" style="margin-top: 5px">
           <el-col :span="8">
-            <d-player :video="user.video"></d-player>
+            <d-player :video="user.video" v-if="user.video"></d-player>
+            <el-alert
+              v-else
+              title="用户尚未上传视频"
+              type="error"
+              show-icon>
+            </el-alert>
           </el-col>
           <el-col :span="16">
             <div class="amap-page-container" v-if="user.map">
@@ -93,10 +99,16 @@
                 <el-amap-marker :position="user.map.marker.position" :visible="user.map.marker.visible" :draggable="user.map.marker.draggable"></el-amap-marker>
               </el-amap>
             </div>
+            <el-alert
+              v-else
+              title="未获取用户地理位置信息"
+              type="error"
+              show-icon>
+            </el-alert>
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="支付信息">
+      <el-tab-pane label="支付信息" name="paymentInfo">
         <el-row class="card-info">
           <el-col :span="12" :offset="6">
             <el-card class="box-card">
@@ -188,7 +200,7 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane>
+      <el-tab-pane name="contactInfo">
         <span slot="label">
           手机通讯录 <el-badge class="mark" :value="user.callRecords.length" />
         </span>
@@ -209,7 +221,7 @@
           <contact :info="item"></contact>
         </el-col>
       </el-tab-pane>
-      <el-tab-pane>
+      <el-tab-pane name="smsInfo">
         <span slot="label">
           手机短信记录 <el-badge class="mark" :value="showingSms.length" />
         </span>
@@ -257,7 +269,7 @@
           </el-table-column>
         </el-table>
       </el-tab-pane>
-      <el-tab-pane label="运营商数据">
+      <el-tab-pane label="运营商数据" name="carrierInfo">
         <span slot="label">
           运营商数据 <el-badge class="mark" :value="carrierRecordsLength" />
         </span>
@@ -300,7 +312,7 @@
           </el-row>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="用户审核">
+      <el-tab-pane label="用户审核" name="checkInfo">
         <risk-control :user="user" :order="user.currentOrder"></risk-control>
       </el-tab-pane>
     </el-tabs>
@@ -343,6 +355,7 @@
     },
     data() {
       return {
+        activeTab: 'basicInfo',
         dialogPhotoVisible: false,
         contactQuery: {
           mobile: '',
@@ -445,6 +458,42 @@
       onKeySelected(keyword) {
         this.showingSms = this.redKeywordsMap[keyword];
       },
+      prepareOrderInfo() {
+        this
+          .loadUserOrders(this.user.id)
+          .then((orders) => {
+            if (orders[0]) {
+              this.user.currentOrder = orders[0];
+            }
+          })
+          .catch((err) => {
+            console.log('error when prepareOrderInfo', err);
+          });
+      },
+      prepareCarrierData() {
+        getUserCarrierInfo(this.user.id, this.user.mobile)
+          .then((data) => {
+            this.user.carrierInfo = data;
+            this.carrierRecordsLength = this.user.carrierInfo.callRecords.length;
+            const carrierContactMap = buildContactMap(
+              this.user.us_address_books, this.user.carrierInfo.compatibleRecords,
+            );
+            const carrierContacts = prepareUserContactData(carrierContactMap);
+            this.carrierContacts = carrierContacts.filter(elem => elem.call.length > 0);
+          })
+          .catch((err) => {
+            console.log('error when prepareCarrierData', err);
+          });
+      },
+      prepareTencentScore() {
+        getTencentScore(this.user)
+          .then((score) => {
+            this.tencentScore = score;
+          })
+          .catch((err) => {
+            console.log('error when prepareTencentScore', err);
+          });
+      },
     },
     async mounted() {
       const uid = this.$route.params.id;
@@ -461,30 +510,16 @@
         });
         this.redKeywordsMap = buildSmsKeywordMap(this.showingSms, redKeywords);
 
-        const orders = await this.loadUserOrders(this.user.id);
-        if (orders[0]) {
-          this.user.currentOrder = orders[0];
-        }
+        this.prepareOrderInfo();
+        this.prepareCarrierData();
+        this.prepareTencentScore();
       } catch (err) {
         handleError(err, this.$message);
       }
-
-      try {
-        this.user.carrierInfo = await getUserCarrierInfo(uid, this.user.mobile);
-        this.carrierRecordsLength = this.user.carrierInfo.callRecords.length;
-        const carrierContactMap = buildContactMap(
-          this.user.us_address_books, this.user.carrierInfo.compatibleRecords,
-        );
-        const carrierContacts = prepareUserContactData(carrierContactMap);
-        this.carrierContacts = carrierContacts.filter(elem => elem.call.length > 0);
-      } catch (err) {
-        handleError(err, this.$message);
-      }
-
-      try {
-        this.tencentScore = await getTencentScore(this.user);
-      } catch (err) {
-        handleError(err, this.$message);
+    },
+    created() {
+      if (this.$route.query.tab) {
+        this.activeTab = this.$route.query.tab;
       }
     },
   };
