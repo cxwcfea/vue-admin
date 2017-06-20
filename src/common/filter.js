@@ -128,6 +128,25 @@ function linkmanRelation(val) {
   }
 }
 
+function loanOverdueTag(val) {
+  switch (val) {
+    case 0:
+      return '未逾期';
+    case 1:
+      return '3天以内';
+    case 2:
+      return '4-30天';
+    case 3:
+      return '31-60天';
+    case 4:
+      return '61-90天';
+    case 5:
+      return '90以上';
+    default:
+      return '未知';
+  }
+}
+
 export {
   dateFormatter,
   gender,
@@ -140,4 +159,5 @@ export {
   callDirection,
   smsDirection,
   linkmanRelation,
+  loanOverdueTag,
 };

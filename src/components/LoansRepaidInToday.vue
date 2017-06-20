@@ -3,9 +3,9 @@
     <el-col :span="24" class="toolbar">
       <el-form :inline="true">
         <el-form-item label="类型">
-          <el-radio-group v-model="loanStatus" @change="onLoanStatusChange">
+          <el-radio-group v-model="loanType" @change="onLoanTypeChange">
             <el-radio-button label="全部"></el-radio-button>
-            <el-radio-button label="未还"></el-radio-button>
+            <el-radio-button label="逾期还款"></el-radio-button>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -40,9 +40,9 @@
           <span style="">{{ scope.row.repaid_date | dateFormatter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态">
+      <el-table-column label="逾期">
         <template scope="scope">
-          <span style="">{{ scope.row.status === 0 ? '进行中' : '完结' }}</span>
+          <span style="">{{ scope.row.overdue_tag | loanOverdueTag }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -74,17 +74,17 @@
         loans: [],
         itemPerPage: 15,
         isLoading: false,
-        loanStatus: '全部',
-        query: { due: true },
+        loanType: '全部',
+        query: { todayPaid: true },
       };
     },
     methods: {
-      onLoanStatusChange(status) {
+      onLoanTypeChange(status) {
         this.currentPage = 1;
-        if (status === '未还') {
-          this.query.status = 0;
+        if (status === '逾期还款') {
+          this.query.overDue = 1;
         } else {
-          this.query.status = 1;
+          delete this.query.overDue;
         }
         this.fetchItems();
       },
