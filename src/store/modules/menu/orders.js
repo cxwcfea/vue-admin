@@ -1,6 +1,7 @@
 import AllOrders from '@/components/AllOrders';
 import OverdueOrders from '@/components/OverdueOrders';
 import WaitingPayOrders from '@/components/WaitingPayOrderList';
+import LoansBecomeDue from '@/components/LoansBecomeDue';
 
 export default {
   name: 'Orders',
@@ -26,6 +27,15 @@ export default {
         roles: ['F_SUPPORT', 'FINANCE'],
       },
       component: WaitingPayOrders,
+    },
+    {
+      name: 'LoansBecomeDueByToday',
+      path: '/orders/loansBecomeDue',
+      meta: {
+        label: '今日到期列表',
+        roles: ['SUPPORT', 'F_SUPPORT'],
+      },
+      component: LoansBecomeDue,
     },
     {
       name: 'OverdueOrders',

@@ -328,6 +328,24 @@ export async function getLoanList(offset, limit, query) {
   return data;
 }
 
+export async function getSubLoanList(offset, limit, query) {
+  let queryStr = `?offset=${offset}&limit=${limit}`;
+  if (query.todayPaid) {
+    queryStr += '&todayPaid=1';
+  }
+  if (query.due) {
+    queryStr += '&due=1';
+  }
+  if (query.status === 0) {
+    queryStr += '&unpay=1';
+  }
+  if (query.overDue) {
+    queryStr += '&overDue=1';
+  }
+  const { data } = await axios.get(`/api/sub_loans${queryStr}`);
+  return data;
+}
+
 export async function approveToPayUser(data) {
   const { data: result } = await axios.post('/api/approve_to_pay', data);
   return result;
