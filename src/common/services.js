@@ -363,6 +363,16 @@ export async function getRiskControlList(offset, limit, query) {
   return data;
 }
 
+export async function getUserFeedback(offset, limit) {
+  const { data } = await axios.get(`/api/feedbacks?offset=${offset}&limit=${limit}`);
+  return data;
+}
+
+export async function getRefundOrders(offset, limit) {
+  const { data } = await axios.get(`/api/refund_orders?offset=${offset}&limit=${limit}`);
+  return data;
+}
+
 export function handleError(error, showMsg) {
   let message = error.message;
   if (error.response) {

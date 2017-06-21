@@ -147,6 +147,19 @@ function loanOverdueTag(val) {
   }
 }
 
+function paymentOrderStatus(val) {
+  switch (val) {
+    case 0:
+      return '支付中';
+    case 1:
+      return '支付成功';
+    case 2:
+      return '支付失败';
+    default:
+      return '未知';
+  }
+}
+
 export {
   dateFormatter,
   gender,
@@ -160,4 +173,5 @@ export {
   smsDirection,
   linkmanRelation,
   loanOverdueTag,
+  paymentOrderStatus,
 };

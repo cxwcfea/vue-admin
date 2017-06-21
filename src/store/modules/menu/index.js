@@ -1,6 +1,7 @@
 import Dashboard from '@/components/Dashboard';
 import Finance from '@/components/Finance';
 import RiskControlList from '@/components/RiskControlList';
+import UserFeedback from '@/components/UserFeedback';
 import Test from '@/components/Test';
 import users from './users';
 import orders from './orders';
@@ -56,6 +57,15 @@ const menuState = {
     },
     users,
     orders,
+    {
+      name: 'UserFeedback',
+      path: '/user_feedback',
+      meta: {
+        icon: 'fa-commenting-o',
+        label: '用户反馈',
+      },
+      component: UserFeedback,
+    },
     {
       name: 'Test',
       path: '/test',

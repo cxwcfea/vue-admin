@@ -72,6 +72,7 @@
   aside {
     flex: 0 0 230px;
     width: 230px;
+    overflow-x: hidden;
     .el-menu {
       height: 100%
     }

@@ -3,6 +3,7 @@ import OverdueOrders from '@/components/OverdueOrders';
 import WaitingPayOrders from '@/components/WaitingPayOrderList';
 import LoansBecomeDue from '@/components/LoansBecomeDue';
 import LoansRepaidInToday from '@/components/LoansRepaidInToday';
+import RefundOrders from '@/components/RefundOrders';
 
 export default {
   name: 'Orders',
@@ -54,6 +55,14 @@ export default {
         label: '催收列表',
       },
       component: OverdueOrders,
+    },
+    {
+      name: 'RefundOrders',
+      path: '/orders/refund',
+      meta: {
+        label: '退款订单列表',
+      },
+      component: RefundOrders,
     },
   ],
 };
