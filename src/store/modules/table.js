@@ -7,10 +7,6 @@ const tableState = {
   userList: {
     cols: [
       {
-        label: '姓名',
-        prop: 'name',
-      },
-      {
         label: '手机号',
         prop: 'mobile',
       },

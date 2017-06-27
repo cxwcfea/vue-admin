@@ -25,6 +25,11 @@
     </el-col>
 
     <el-table :data="tableMeta.data" highlight-current-row v-loading="tableMeta.isLoading" style="width: 100%;">
+      <el-table-column label="姓名">
+        <template scope="scope">
+          <span style=""><a :href="`/user/${scope.row.id}`" target="_blank">{{ scope.row.name }}</a></span>
+        </template>
+      </el-table-column>
       <el-table-column
         v-for="(item, index) in tableMeta.cols"
         :prop="item.prop"
