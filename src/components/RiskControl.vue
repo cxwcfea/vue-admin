@@ -29,7 +29,6 @@
 </template>
 
 <script>
-  import { mapActions } from 'vuex';
   import UserReview from './UserReview';
   import UserScoreList from './UserScoreList';
   import UserRiskCheck from './UserRiskCheck';
@@ -56,9 +55,6 @@
       userRiskCheck: UserRiskCheck,
     },
     methods: {
-      ...mapActions([
-        'loadUserOrders',
-      ]),
       onReviewSubmit(data) {
         reviewUser({
           mobile: this.user.mobile,

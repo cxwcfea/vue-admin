@@ -2,7 +2,7 @@
   <section>
     <el-table :data="orders" highlight-current-row v-loading="isLoading" @row-click="onRowClick" style="width: 100%;">
       <el-table-column
-        v-for="(item, index) in cols"
+        v-for="(item, index) in orderCols"
         :prop="item.prop"
         :label="item.label"
         :key="item.label"
@@ -95,9 +95,6 @@
       isLoading: {
         default: false,
       },
-      cols: {
-        required: true,
-      },
     },
     data() {
       return {
@@ -121,7 +118,11 @@
         subLoans: [],
       };
     },
-    computed: {},
+    computed: {
+      orderCols() {
+        return this.$store.state.table.allOrders.cols;
+      },
+    },
     methods: {
       subLoanState(row) {
         return row.status === 0

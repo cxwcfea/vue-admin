@@ -1,5 +1,5 @@
 <template>
-  <order-list :orders="tableMeta.data" :cols="tableMeta.cols"></order-list>
+  <order-list :orders="tableMeta.data"></order-list>
 </template>
 
 <script>

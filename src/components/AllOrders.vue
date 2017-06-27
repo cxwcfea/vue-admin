@@ -43,7 +43,7 @@
       </el-form>
     </el-col>
 
-    <order-list :orders="tableMeta.data" :cols="tableMeta.cols" :isLoading="tableMeta.isLoading"></order-list>
+    <order-list :orders="tableMeta.data" :isLoading="tableMeta.isLoading"></order-list>
 
     <el-col :span="24" class="toolbar">
       <el-pagination

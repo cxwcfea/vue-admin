@@ -315,6 +315,9 @@
       <el-tab-pane label="用户审核" name="checkInfo">
         <risk-control :user="user" :order="user.currentOrder"></risk-control>
       </el-tab-pane>
+      <el-tab-pane label="贷款订单" name="loans">
+        <order-list :orders="orders"></order-list>
+      </el-tab-pane>
     </el-tabs>
 
     <el-dialog title="照片查看" v-model="dialogPhotoVisible">
@@ -331,6 +334,7 @@
   import Contact from './Contact';
   import FeatureChart from './FeatureChart';
   import RiskControl from './RiskControl';
+  import OrderList from './OrderList';
   import { collectNumSet, redKeywords } from '../common/constants';
   import { dateFormatter } from '../common/filter';
   import {
@@ -351,6 +355,7 @@
       contact: Contact,
       featureChart: FeatureChart,
       riskControl: RiskControl,
+      orderList: OrderList,
       'd-player': VueDPlayer,
     },
     data() {
@@ -382,6 +387,7 @@
         carrierRecordsLength: 0,
         carrierSortType: null,
         tencentScore: -1,
+        orders: [],
       };
     },
     computed: {
@@ -462,6 +468,12 @@
         this
           .loadUserOrders(this.user.id)
           .then((orders) => {
+            this.orders = orders;
+            this.orders.forEach((elem) => {
+              elem.userName = this.user.name;
+              elem.channel = this.user.channel;
+              elem.order_count = this.user.order_count;
+            });
             if (orders[0]) {
               this.user.currentOrder = orders[0];
             }
