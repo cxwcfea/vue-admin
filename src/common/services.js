@@ -373,6 +373,11 @@ export async function getRefundOrders(offset, limit) {
   return data;
 }
 
+export async function getPlatformStatisticsData(channel, startDay, endDay) {
+  const { data } = await axios.get(`/api/fetch_count_data?channel=${channel}&startDay=${startDay}&endDay=${endDay}`);
+  return data;
+}
+
 export function handleError(error, showMsg) {
   let message = error.message;
   if (error.response) {

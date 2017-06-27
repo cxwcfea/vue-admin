@@ -237,3 +237,41 @@ export function prepareUserContactData(contactMap, linkman) {
 
   return userContacts;
 }
+
+export function getDayArray(startDay, endDay) {
+  const SECONDS_OF_DAY = 86400000; // 24 * 60 * 60 * 1000;
+  const startDate = new Date(startDay);
+  const endDate = new Date(endDay);
+  const startTimestamp = startDate.getTime();
+  const endTimeStamp = endDate.getTime();
+  const diff = endTimeStamp - startTimestamp;
+  const result = [];
+  for (let i = 0; i <= diff; i += SECONDS_OF_DAY) {
+    const date = new Date(startTimestamp + i);
+    result.push(moment(date).format('YYYY-MM-DD'));
+  }
+  return result;
+}
+
+export const dateRangePickerOptions = {
+  shortcuts: [
+    {
+      text: '最近一周',
+      onClick(picker) {
+        const end = new Date();
+        const start = new Date();
+        start.setTime(start.getTime() - (3600 * 1000 * 24 * 7));
+        picker.$emit('pick', [start, end]);
+      },
+    },
+    {
+      text: '最近一个月',
+      onClick(picker) {
+        const end = new Date();
+        const start = new Date();
+        start.setTime(start.getTime() - (3600 * 1000 * 24 * 30));
+        picker.$emit('pick', [start, end]);
+      },
+    },
+  ],
+};
