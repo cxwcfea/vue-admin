@@ -43,14 +43,6 @@ const tableState = {
   allOrders: {
     cols: [
       {
-        label: '订单号',
-        prop: 'serial_number',
-      },
-      {
-        label: '用户名',
-        prop: 'userName',
-      },
-      {
         label: '本金',
         prop: 'principal',
         filter(row) {
@@ -114,10 +106,6 @@ const tableState = {
   },
   overdueOrders: {
     cols: [
-      {
-        label: '姓名',
-        prop: 'name',
-      },
       {
         label: '手机号',
         prop: 'mobile',

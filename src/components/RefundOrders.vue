@@ -2,9 +2,11 @@
   <section style="margin-top: 5px;">
     <el-table :data="data" border highlight-current-row v-loading="isLoading" style="width: 100%;">
       <el-table-column
-        prop="order_id_fk"
-        label="贷款单号"
-      ></el-table-column>
+        label="贷款单号">
+        <template scope="scope">
+          <span style=""><a :href="`/loan/${scope.row.order_id_fk}`">{{ scope.row.order_id_fk }}</a></span>
+        </template>
+      </el-table-column>
       <el-table-column label="用户id">
         <template scope="scope">
           <span style=""><a :href="`/user/${scope.row.user_id_fk}`">{{ scope.row.user_id_fk }}</a></span>

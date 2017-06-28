@@ -37,9 +37,13 @@
       @row-click="onRowClick"
       @selection-change="onRowSelectionChange"
       :data="tableMeta.data"
-      style="width: 100%"
-    >
+      style="width: 100%">
       <el-table-column type="selection" v-if="showAssign"></el-table-column>
+      <el-table-column label="姓名">
+        <template scope="scope">
+          <span style=""><a :href="`/user/${scope.row.uid}`" target="_blank">{{ scope.row.name }}</a></span>
+        </template>
+      </el-table-column>
       <el-table-column
         v-for="(item, index) in tableMeta.cols"
         :prop="item.prop"

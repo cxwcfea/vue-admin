@@ -81,6 +81,7 @@ export async function getOverdueOrders(data, pageSize, uri) {
   const vm = response.data;
   let index = 0;
   vm.forEach((elem) => {
+    elem.uid = elem.os_loan_order.us_user.id;
     elem.name = elem.os_loan_order.us_user.name;
     elem.mobile = elem.os_loan_order.us_user.mobile;
     elem.ic_number = elem.os_loan_order.us_user.ic_number;
@@ -375,6 +376,13 @@ export async function getRefundOrders(offset, limit) {
 
 export async function getPlatformStatisticsData(channel, startDay, endDay) {
   const { data } = await axios.get(`/api/fetch_count_data?channel=${channel}&startDay=${startDay}&endDay=${endDay}`);
+  return data;
+}
+
+export async function getLoanInfo(oid) {
+  const search = `id:${oid}`;
+  const { data: res } = await axios.get(`/api/loans?search=${encodeURIComponent(search)}`);
+  const { data } = res;
   return data;
 }
 

@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Home from '@/components/Home';
 import Login from '@/components/Login';
 import User from '@/components/User';
+import OrderWrapper from '@/components/OrderWrapper';
 import menuModule from '@/store/modules/menu';
 import { isLoggedIn } from '@/common/auth';
 
@@ -40,6 +41,14 @@ const router = new Router({
             label: '用户详情',
           },
           component: User,
+        },
+        {
+          name: 'LoanDetail',
+          path: '/loan/:id',
+          meta: {
+            label: '借款订单详情',
+          },
+          component: OrderWrapper,
         },
       ],
     },

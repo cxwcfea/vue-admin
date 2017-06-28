@@ -5,13 +5,16 @@
 
     <el-table :data="loans" border highlight-current-row v-loading="isLoading" style="width: 100%;">
       <el-table-column
-        prop="us_user.name"
-        label="用户"
-      ></el-table-column>
+        label="用户">
+        <template scope="scope">
+          <span style=""><a :href="`/user/${scope.row.us_user.id}`" target="_blank">{{ scope.row.us_user.name }}</a></span>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="serial_number"
         label="编号"
-      ></el-table-column>
+        width="180">
+      </el-table-column>
       <el-table-column label="本金">
         <template scope="scope">
           <span style="">{{ scope.row.principal | amount }}</span>

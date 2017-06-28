@@ -1,6 +1,16 @@
 <template>
   <section>
-    <el-table :data="orders" highlight-current-row v-loading="isLoading" @row-click="onRowClick" style="width: 100%;">
+    <el-table :data="orders" highlight-current-row v-loading="isLoading" style="width: 100%;">
+      <el-table-column label="订单号">
+        <template scope="scope">
+          <span style=""><a href="" @click.prevent="showLoanDetail(scope.row)">{{ scope.row.serial_number }}</a></span>
+        </template>
+      </el-table-column>
+      <el-table-column label="用户名">
+        <template scope="scope">
+          <span style=""><a :href="`/user/${scope.row.user_id_fk}`" target="_blank">{{ scope.row.userName }}</a></span>
+        </template>
+      </el-table-column>
       <el-table-column
         v-for="(item, index) in orderCols"
         :prop="item.prop"
@@ -128,11 +138,6 @@
         return row.status === 0
           ? '进行中'
           : '完结';
-      },
-      onRowClick(row, event, column) {
-        if (column.property === 'serial_number') {
-          this.showLoanDetail(row);
-        }
       },
       async showLoanDetail(loan) {
         try {

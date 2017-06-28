@@ -13,9 +13,11 @@
 
     <el-table :data="loans" border highlight-current-row v-loading="isLoading" style="width: 100%;">
       <el-table-column
-        prop="order_id_fk"
-        label="订单号"
-      ></el-table-column>
+        label="订单号">
+        <template scope="scope">
+          <span style=""><a :href="`/loan/${scope.row.order_id_fk}`">{{ scope.row.order_id_fk }}</a></span>
+        </template>
+      </el-table-column>
       <el-table-column label="本金">
         <template scope="scope">
           <span style="">{{ scope.row.principal | amount }}</span>
